@@ -11,6 +11,7 @@ public extension DiasporaNodeInfo.v2_0 {
     enum OutboundSite: String, Codable {
         case atom1_0 = "atom1.0"
         case blogger
+        case bluesky
         case buddycloud
         case diaspora
         case dreamwidth

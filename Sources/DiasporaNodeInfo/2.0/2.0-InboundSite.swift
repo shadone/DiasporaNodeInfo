@@ -10,6 +10,7 @@ public extension DiasporaNodeInfo.v2_0 {
     /// The third party sites this server can retrieve messages from for combined display with regular traffic.
     enum InboundSite: String, Codable {
         case atom1_0 = "atom1.0"
+        case bluesky
         case gnusocial
         case imap
         case pnut
