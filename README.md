@@ -62,6 +62,6 @@ mint run shadone/DiasporaNodeInfo@main mastodon.social
 [swift versions]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo
 [swift versions badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dswift-versions
 [platforms]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo
-[platforms badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dswift-versions
+[platforms badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dplatforms
 [documentation]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo/main/documentation
 [documentation badge]: https://img.shields.io/badge/Documentation-DocC-blue
