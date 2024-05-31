@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2023, Denis Dzyubenko <denis@ddenis.info>
+// Copyright (c) 2023-2024, Denis Dzyubenko <denis@ddenis.info>
 //
 // SPDX-License-Identifier: BSD-2-Clause
 //
@@ -236,5 +236,30 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.usage.localComments, 1912053)
         XCTAssertEqual(nodeInfo.v2_0!.openRegistrations, true)
         XCTAssertEqual(nodeInfo.v2_0!.metadata, nil)
+    }
+
+    func testUnknownService() throws {
+        let nodeInfoInput = """
+        {
+          "version":"2.0",
+          "software":{"name":"lemmy","version":"0.18.5"},
+          "protocols":["activitypub"],
+          "usage":{"users":{"total":149738,"activeHalfyear":26917,"activeMonth":10536},"localPosts":234483,"localComments":1912053},
+          "openRegistrations":true,
+          "services": {
+            "inbound": ["pumpio", "unexpected-inbound-service"],
+            "outbound": ["smtp", "unexpected-outbound-service"]
+          },
+        }
+        """.data(using: .utf8)!
+
+        let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
+        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
+        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
+        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertNotNil(nodeInfo.v2_0!.services)
+        XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
+        XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
     }
 }
