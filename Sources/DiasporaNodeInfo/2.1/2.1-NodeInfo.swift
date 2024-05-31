@@ -7,7 +7,7 @@
 import Foundation
 
 public extension DiasporaNodeInfo.v2_1 {
-    /// NodeInfo schema version 2.0.
+    /// NodeInfo schema version 2.1.
     struct NodeInfo: Codable {
         /// The schema version, must be `2.1`.
         public let version: String

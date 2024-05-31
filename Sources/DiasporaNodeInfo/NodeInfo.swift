@@ -7,7 +7,9 @@
 import Foundation
 
 public enum NodeInfo {
+    /// NodeInfo schema version 2.0
     case v2_0(DiasporaNodeInfo.v2_0.NodeInfo)
+    /// NodeInfo schema version 2.1
     case v2_1(DiasporaNodeInfo.v2_1.NodeInfo)
 
     /// Returns the version of the NodeInfo schema that is supported by the queried domain.

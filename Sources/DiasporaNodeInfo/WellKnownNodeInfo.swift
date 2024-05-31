@@ -6,9 +6,9 @@
 
 import Foundation
 
-/// JRD document referencing the supported documents via Link elements.
+/// JSON Resource Descriptor (JRD) document referencing the supported documents via Link elements.
 ///
-/// See [RFC8288](https://datatracker.ietf.org/doc/html/rfc8288).
+/// See [RFC8288](https://datatracker.ietf.org/doc/html/rfc8288)
 ///
 /// Hosted at `/.well-known/nodeinfo`.
 ///

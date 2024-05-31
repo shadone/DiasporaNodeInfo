@@ -6,6 +6,7 @@
 
 import Foundation
 
+/// Main entry point for fetching node info.
 public struct NodeInfoManager {
     // MARK: Public
 
@@ -13,12 +14,12 @@ public struct NodeInfoManager {
         /// The given domain was not a valid host name.
         case invalidDomain
 
-        /// The host does not support NodeInfo protocol.
+        /// The domain does not support NodeInfo protocol.
         case unsupported
 
-        /// The host supports NodeInfo protocol but we couldn't find a suitable supported version of the schema.
+        /// The domain supports NodeInfo protocol but we couldn't find a suitable supported version of the schema.
         ///
-        /// This could happen if the server supports only a newer version of the spec that we implement.
+        /// This could happen if the server supports only a newer version of the spec than the versions we implement.
         ///
         /// - Parameter schemas: the list of schemas that the given domain claims to support.
         case supportedNodeInfoSchemaNotFound(schemas: [String])
@@ -39,6 +40,8 @@ public struct NodeInfoManager {
 
     // MARK: Functions
 
+    /// Create a manager for fetching node info using the given network session.
+    /// - Parameter session: optional ``URLSession`` that will be used for fetching node info.
     public init(session: URLSession = .shared) {
         self.session = session
     }
@@ -118,6 +121,10 @@ public struct NodeInfoManager {
         }
     }
 
+    /// Fetch node info for the given domain name.
+    /// - Parameter domain: website domain name, without protocol. E.g. "mastodon.social".
+    /// - Returns: ``NodeInfo`` for a given spec version.
+    /// - Throws ``NodeInfoManager/Error`` or ``Swift.Error`` in case of a network error.
     public func fetch(for domain: String) async throws -> NodeInfo {
         let nodeInfoUrl = try await discoverNodeInfoUrlFromWellKnownNodeInfo(for: domain)
 
