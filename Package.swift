@@ -27,7 +27,10 @@ let package = Package(
     targets: [
         .target(
             name: "DiasporaNodeInfo",
-            dependencies: []
+            dependencies: [],
+            resources: [
+                .process("PrivacyInfo.xcprivacy"),
+            ]
         ),
         .testTarget(
             name: "DiasporaNodeInfoTests",
