@@ -9,16 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- none
+
+### Changed
+
+- none
+
+### Removed
+
+- none
+
+## [1.1.1] - 2024-05-31
+
+### Added
+
 - Added a privacy manifest
 
 ### Changed
 
 - Updated Swift tools version from 5.9 to 5.10
 - Enabled StrictConcurrency and DisableOutwardActorInference upcoming Swift features
-
-### Removed
-
-- none
 
 ## [1.1.0] - 2024-05-31
 
