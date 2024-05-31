@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2023, Denis Dzyubenko <denis@ddenis.info>
+// Copyright (c) 2023-2024, Denis Dzyubenko <denis@ddenis.info>
 //
 // SPDX-License-Identifier: BSD-2-Clause
 //
@@ -7,7 +7,7 @@
 import Foundation
 
 /// The list of supported NodeInfo schema versions.
-public enum WellKnownNodeInfoSchema: String, CustomDebugStringConvertible {
+public enum WellKnownNodeInfoSchema: String, CustomDebugStringConvertible, Sendable {
     case v2_0 = "http://nodeinfo.diaspora.software/ns/schema/2.0"
     case v2_1 = "http://nodeinfo.diaspora.software/ns/schema/2.1"
 
@@ -27,7 +27,7 @@ public enum WellKnownNodeInfoSchema: String, CustomDebugStringConvertible {
     public var debugDescription: String { shortVersionString }
 
     /// List of all schema versions supported by the library, ordered from oldest to newest.
-    public static var allOrderedSchemas: [WellKnownNodeInfoSchema] = [
+    public static let allOrderedSchemas: [WellKnownNodeInfoSchema] = [
         .v2_0,
         .v2_1,
     ]
