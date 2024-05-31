@@ -1,7 +1,8 @@
 # Diaspora NodeInfo
 
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/shadone/DiasporaNodeInfo)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/shadone/DiasporaNodeInfo)
+[![Swift versions][swift versions badge]][swift versions]
+[![Platforms][platforms badge]][platforms]
+[![Documentation][documentation badge]][documentation]
 
 Implementation of [NodeInfo](https://nodeinfo.diaspora.software) protocol in Swift.
 
@@ -30,7 +31,7 @@ These are the most modern and widely used versions of the protocol.
 
 ## Usage
 
-DisporaNodeInfo package comes with a library which you could integrate into your app, as well as a command line tool for quering remote server NodeInfo.
+DiasporaNodeInfo package comes with a library which you could integrate into your app, as well as a command line tool for quering remote server NodeInfo.
 
 ```swift
 // swift-tools-version: 5.9
@@ -57,3 +58,10 @@ To use the command line you compile it or run with [Mint](https://github.com/yon
 ```sh
 mint run shadone/DiasporaNodeInfo@main mastodon.social
 ```
+
+[swift versions]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo
+[swift versions badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dswift-versions
+[platforms]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo
+[platforms badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fshadone%2FDiasporaNodeInfo%2Fbadge%3Ftype%3Dswift-versions
+[documentation]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo/main/documentation
+[documentation badge]: https://img.shields.io/badge/Documentation-DocC-blue
