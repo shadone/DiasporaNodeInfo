@@ -56,7 +56,7 @@ let package = Package(
 To use the command line you compile it or run with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
-mint run shadone/DiasporaNodeInfo@main mastodon.social
+mint run shadone/DiasporaNodeInfo mastodon.social
 ```
 
 [swift versions]: https://swiftpackageindex.com/shadone/DiasporaNodeInfo
