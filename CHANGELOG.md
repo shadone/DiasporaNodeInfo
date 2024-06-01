@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - none
 
+## [1.1.2] - 2024-06-01
+
+### Changed
+
+- Fixed bundling privacy manifest file
+
 ## [1.1.1] - 2024-05-31
 
 ### Added
@@ -47,5 +53,7 @@ fail parsing nodeinfo, it should be acceptable.
 Initial release
 
 [unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.0...HEAD
+[1.1.2]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.1...1.1.2
+[1.1.1]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/shadone/DiasporaNodeInfo/releases/tag/1.0.0
