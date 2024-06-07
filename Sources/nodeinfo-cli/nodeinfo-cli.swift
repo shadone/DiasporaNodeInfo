@@ -61,7 +61,7 @@ struct NodeInfoCLI: AsyncParsableCommand {
                     print("\t\tHomepage: \(homepage)")
                 }
                 if let repository = nodeinfo.software.repository {
-                    print("\\t\tRepo: \(repository)")
+                    print("\t\tRepo: \(repository)")
                 }
 
                 print("\tProtocols: \(nodeinfo.protocols.map(\.debugDescription).joined(separator: ", "))")
