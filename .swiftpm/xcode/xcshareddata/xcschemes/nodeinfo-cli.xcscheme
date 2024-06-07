@@ -78,6 +78,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "mastodon.social"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "xn--y9aaaan6ae5bex1bccgcxbfc3mrbjd.xn--y9a3aq"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -13,9 +13,9 @@ public extension DiasporaNodeInfo.v2_0 {
         public let users: Users
 
         /// The amount of posts that were made by users that are registered on this server.
-        public let localPosts: UInt?
+        public let localPosts: LenientInt?
 
         /// The amount of comments that were made by users that are registered on this server.
-        public let localComments: UInt?
+        public let localComments: LenientInt?
     }
 }
