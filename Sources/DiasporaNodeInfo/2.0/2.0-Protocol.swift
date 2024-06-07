@@ -10,7 +10,9 @@ public extension DiasporaNodeInfo.v2_0 {
     enum ProtocolType: String, Codable, CustomDebugStringConvertible {
         /// ActivityPub
         ///
-        /// See more: https://en.wikipedia.org/wiki/ActivityPub
+        /// See more:
+        ///   - https://en.wikipedia.org/wiki/ActivityPub
+        ///   - https://www.w3.org/TR/activitypub/
         case activitypub
 
         /// Buddycloud
@@ -58,6 +60,11 @@ public extension DiasporaNodeInfo.v2_0 {
         /// - Note: This protocol is deprecated.
         case zot
 
+        /// Webmention
+        ///
+        /// See more: https://www.w3.org/TR/webmention/
+        case webmention
+
         public var debugDescription: String {
             switch self {
             case .activitypub: return "ActivityPub"
@@ -70,6 +77,7 @@ public extension DiasporaNodeInfo.v2_0 {
             case .tent: return "Tent"
             case .xmpp: return "XMPP"
             case .zot: return "Zot"
+            case .webmention: return "Webmention"
             }
         }
     }
