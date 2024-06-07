@@ -16,7 +16,7 @@ public extension DiasporaNodeInfo.v2_1 {
         public let software: Software
 
         /// The protocols supported on this server.
-        public let protocols: [ProtocolType]
+        public let protocols: [ValueOrUnknown<ProtocolType>]
 
         /// The third party sites this server can connect to via their application API.
         ///

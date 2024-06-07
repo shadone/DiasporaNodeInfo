@@ -81,8 +81,12 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "xn--y9aaaan6ae5bex1bccgcxbfc3mrbjd.xn--y9a3aq"
+            argument = "wedistribute.org"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "xn--y9aaaan6ae5bex1bccgcxbfc3mrbjd.xn--y9a3aq"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

@@ -96,3 +96,14 @@ extension ValueOrUnknown: Equatable where Value: Equatable, Value.RawValue: Equa
         }
     }
 }
+
+extension ValueOrUnknown: CustomDebugStringConvertible where Value: CustomDebugStringConvertible, Value.RawValue: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        switch self {
+        case let .value(value):
+            return value.debugDescription
+        case let .unknown(rawValue):
+            return rawValue.debugDescription
+        }
+    }
+}

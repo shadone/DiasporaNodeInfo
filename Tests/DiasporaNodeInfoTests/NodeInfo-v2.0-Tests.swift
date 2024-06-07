@@ -48,7 +48,7 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
         XCTAssertEqual(nodeInfo.v2_0!.software.name, "mastodon")
         XCTAssertEqual(nodeInfo.v2_0!.software.version, "4.1.5+nightly-2023-07-28")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
         XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [])
         XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [])
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 1479509)
@@ -157,7 +157,7 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
         XCTAssertEqual(nodeInfo.v2_0!.software.name, "pleroma")
         XCTAssertEqual(nodeInfo.v2_0!.software.version, "2.5.51-9314-g9528fc46-shitposterclub")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
         XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [])
         XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [])
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 3382)
@@ -227,7 +227,7 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
         XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
         XCTAssertNil(nodeInfo.v2_0!.services)
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 149738)
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeMonth?.value, 10536)
@@ -257,10 +257,29 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
         XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
         XCTAssertNotNil(nodeInfo.v2_0!.services)
         XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
         XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
+    }
+
+    func testUnknownProtocol() throws {
+        let nodeInfoInput = """
+        {
+          "version":"2.0",
+          "software":{"name":"lemmy","version":"0.18.5"},
+          "protocols":["activitypub", "hello-unknown-protocol"],
+          "usage":{"users":{"total":149738,"activeHalfyear":26917,"activeMonth":10536},"localPosts":234483,"localComments":1912053},
+          "openRegistrations":true
+        }
+        """.data(using: .utf8)!
+
+        let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
+        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
+        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
+        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub), .unknown("hello-unknown-protocol")])
+        XCTAssertNil(nodeInfo.v2_0!.services)
     }
 
     func testNoUsersFields() throws {
@@ -285,7 +304,7 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
         XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
         XCTAssertNotNil(nodeInfo.v2_0!.services)
         XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
         XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
@@ -320,7 +339,7 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
         XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 149738)
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeHalfyear?.value, 26917)
         XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeMonth?.value, 10536)

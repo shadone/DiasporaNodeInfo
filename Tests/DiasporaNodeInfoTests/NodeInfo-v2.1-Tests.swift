@@ -52,7 +52,7 @@ final class NodeInfo_v2_1_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_1!.software.version, "1.2.3")
         XCTAssertEqual(nodeInfo.v2_1!.software.homepage, "https://example.com")
         XCTAssertEqual(nodeInfo.v2_1!.software.repository, "https://github.com")
-        XCTAssertEqual(nodeInfo.v2_1!.protocols, [.activitypub])
+        XCTAssertEqual(nodeInfo.v2_1!.protocols, [.value(.activitypub)])
         XCTAssertEqual(nodeInfo.v2_1!.services?.inbound, [])
         XCTAssertEqual(nodeInfo.v2_1!.services?.outbound, [])
         XCTAssertEqual(nodeInfo.v2_1!.usage.users.total?.value, 1)
@@ -83,10 +83,29 @@ final class NodeInfo_v2_1_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_1!.version, "2.1")
         XCTAssertEqual(nodeInfo.v2_1!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_1!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_1!.protocols, [.activitypub])
+            XCTAssertEqual(nodeInfo.v2_1!.protocols, [.value(.activitypub)])
         XCTAssertNotNil(nodeInfo.v2_1!.services)
         XCTAssertEqual(nodeInfo.v2_1!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
         XCTAssertEqual(nodeInfo.v2_1!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
+    }
+
+    func testUnknownProtocol() throws {
+        let nodeInfoInput = """
+        {
+          "version":"2.1",
+          "software":{"name":"lemmy","version":"0.18.5"},
+          "protocols":["activitypub", "hello-unknown-protocol"],
+          "usage":{"users":{"total":149738,"activeHalfyear":26917,"activeMonth":10536},"localPosts":234483,"localComments":1912053},
+          "openRegistrations":true
+        }
+        """.data(using: .utf8)!
+
+        let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
+        XCTAssertEqual(nodeInfo.v2_1!.version, "2.1")
+        XCTAssertEqual(nodeInfo.v2_1!.software.name, "lemmy")
+        XCTAssertEqual(nodeInfo.v2_1!.software.version, "0.18.5")
+        XCTAssertEqual(nodeInfo.v2_1!.protocols, [.value(.activitypub), .unknown("hello-unknown-protocol")])
+        XCTAssertNil(nodeInfo.v2_1!.services)
     }
 
     func testNoUsersFields() throws {
@@ -111,7 +130,7 @@ final class NodeInfo_v2_1_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_1!.version, "2.1")
         XCTAssertEqual(nodeInfo.v2_1!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_1!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_1!.protocols, [.activitypub])
+                XCTAssertEqual(nodeInfo.v2_1!.protocols, [.value(.activitypub)])
         XCTAssertNotNil(nodeInfo.v2_1!.services)
         XCTAssertEqual(nodeInfo.v2_1!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
         XCTAssertEqual(nodeInfo.v2_1!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
@@ -146,7 +165,7 @@ final class NodeInfo_v2_1_Tests: XCTestCase {
         XCTAssertEqual(nodeInfo.v2_1!.version, "2.1")
         XCTAssertEqual(nodeInfo.v2_1!.software.name, "lemmy")
         XCTAssertEqual(nodeInfo.v2_1!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_1!.protocols, [.activitypub])
+                    XCTAssertEqual(nodeInfo.v2_1!.protocols, [.value(.activitypub)])
         XCTAssertEqual(nodeInfo.v2_1!.usage.users.total?.value, 149738)
         XCTAssertEqual(nodeInfo.v2_1!.usage.users.activeHalfyear?.value, 26917)
         XCTAssertEqual(nodeInfo.v2_1!.usage.users.activeMonth?.value, 10536)
