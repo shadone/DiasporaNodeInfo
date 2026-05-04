@@ -8,7 +8,7 @@ import Foundation
 
 public extension DiasporaNodeInfo.v2_0 {
     /// Metadata about server software in use.
-    struct Software: Codable {
+    struct Software: Codable, Sendable {
         /// The canonical name of this server software.
         public let name: String
 

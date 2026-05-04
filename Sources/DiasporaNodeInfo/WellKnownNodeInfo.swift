@@ -13,9 +13,9 @@ import Foundation
 /// Hosted at `/.well-known/nodeinfo`.
 ///
 /// E.g. https://mastodon.social/.well-known/nodeinfo
-struct WellKnownNodeInfo: Decodable {
+struct WellKnownNodeInfo: Decodable, Sendable {
     /// Describes a type of link relation.
-    struct Link: Decodable {
+    struct Link: Decodable, Sendable {
         /// Describes a type of link relation.
         ///
         /// e.g. http://nodeinfo.diaspora.software/ns/schema/2.1

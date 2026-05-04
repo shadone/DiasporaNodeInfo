@@ -8,7 +8,7 @@ import Foundation
 
 public extension DiasporaNodeInfo.v2_1 {
     /// The third party sites this server can publish messages to on the behalf of a user.
-    enum OutboundSite: String, Codable {
+    enum OutboundSite: String, Codable, Sendable {
         case atom1_0 = "atom1.0"
         case blogger
         case buddycloud

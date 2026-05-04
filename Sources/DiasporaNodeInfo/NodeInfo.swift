@@ -6,7 +6,7 @@
 
 import Foundation
 
-public enum NodeInfo {
+public enum NodeInfo: Sendable {
     /// NodeInfo schema version 2.0
     case v2_0(DiasporaNodeInfo.v2_0.NodeInfo)
     /// NodeInfo schema version 2.1

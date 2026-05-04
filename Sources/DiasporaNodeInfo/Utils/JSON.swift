@@ -7,7 +7,7 @@
 import Foundation
 
 // Inspired by Lee Kah Seng https://swiftsenpai.com/swift/decode-dynamic-keys-json/
-public enum JSON: Codable, Equatable {
+public enum JSON: Codable, Equatable, Sendable {
     case string(String)
     case number(Decimal)
     case object([String: JSON])
@@ -112,8 +112,10 @@ public enum JSON: Codable, Equatable {
             } else if singleValueContainer.decodeNil() {
                 self = .null
             } else {
-                // what else could it be?
-                preconditionFailure()
+                throw DecodingError.typeMismatch(JSON.self, .init(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Value is not a JSON primitive (string, number, bool, or null)"
+                ))
             }
         }
     }

@@ -8,7 +8,7 @@ import Foundation
 
 public extension DiasporaNodeInfo.v2_0 {
     /// The third party sites this server can connect to via their application API.
-    struct Services: Codable {
+    struct Services: Codable, Sendable {
         /// The third party sites this server can retrieve messages from for combined display with regular traffic.
         public let inbound: [ValueOrUnknown<InboundSite>]
 

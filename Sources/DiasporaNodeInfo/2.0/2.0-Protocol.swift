@@ -7,7 +7,7 @@
 import Foundation
 
 public extension DiasporaNodeInfo.v2_0 {
-    enum ProtocolType: String, Codable, CustomDebugStringConvertible {
+    enum ProtocolType: String, Codable, CustomDebugStringConvertible, Sendable {
         /// ActivityPub
         ///
         /// See more:

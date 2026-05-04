@@ -8,7 +8,7 @@ import Foundation
 
 public extension DiasporaNodeInfo.v2_1 {
     /// Statistics about the users of this server.
-    struct Users: Codable {
+    struct Users: Codable, Sendable {
         /// The total amount of on this server registered users.
         public let total: LenientInt?
 
