@@ -7,7 +7,7 @@
 import Foundation
 
 public extension DiasporaNodeInfo.v2_0 {
-    enum ProtocolType: String, Codable, CustomDebugStringConvertible {
+    enum ProtocolType: String, Codable, CustomDebugStringConvertible, Sendable {
         /// ActivityPub
         ///
         /// See more:
@@ -67,17 +67,17 @@ public extension DiasporaNodeInfo.v2_0 {
 
         public var debugDescription: String {
             switch self {
-            case .activitypub: return "ActivityPub"
-            case .buddycloud: return "Buddcloud"
-            case .dfrn: return "DFRN"
-            case .diaspora: return "Diaspora"
-            case .libertree: return "Libertree"
-            case .ostatus: return "OStatus"
-            case .pumpio: return "Pump.io"
-            case .tent: return "Tent"
-            case .xmpp: return "XMPP"
-            case .zot: return "Zot"
-            case .webmention: return "Webmention"
+            case .activitypub: "ActivityPub"
+            case .buddycloud: "Buddcloud"
+            case .dfrn: "DFRN"
+            case .diaspora: "Diaspora"
+            case .libertree: "Libertree"
+            case .ostatus: "OStatus"
+            case .pumpio: "Pump.io"
+            case .tent: "Tent"
+            case .xmpp: "XMPP"
+            case .zot: "Zot"
+            case .webmention: "Webmention"
             }
         }
     }

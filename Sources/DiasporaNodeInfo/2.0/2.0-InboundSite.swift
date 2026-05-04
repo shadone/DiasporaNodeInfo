@@ -8,7 +8,7 @@ import Foundation
 
 public extension DiasporaNodeInfo.v2_0 {
     /// The third party sites this server can retrieve messages from for combined display with regular traffic.
-    enum InboundSite: String, Codable {
+    enum InboundSite: String, Codable, Sendable {
         case atom1_0 = "atom1.0"
         case bluesky
         case gnusocial

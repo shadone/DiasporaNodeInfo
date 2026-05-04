@@ -104,6 +104,8 @@ struct NodeInfoCLI: AsyncParsableCommand {
                 print("'\(domain)' the server is temporary unavailable")
             case let .invalidResponse(underlayingError):
                 print("'\(domain)' the server response parse error: \(underlayingError)")
+            case .nonHTTPResponse:
+                print("'\(domain)' the server response was not an HTTP response")
             }
         } catch {
             print("Unexpected error: \(error)")

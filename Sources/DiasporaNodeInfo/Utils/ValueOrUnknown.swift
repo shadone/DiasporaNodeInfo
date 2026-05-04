@@ -107,3 +107,5 @@ extension ValueOrUnknown: CustomDebugStringConvertible where Value: CustomDebugS
         }
     }
 }
+
+extension ValueOrUnknown: Sendable where Value: Sendable, Value.RawValue: Sendable {}

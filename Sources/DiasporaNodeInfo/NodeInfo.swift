@@ -6,7 +6,7 @@
 
 import Foundation
 
-public enum NodeInfo {
+public enum NodeInfo: Sendable {
     /// NodeInfo schema version 2.0
     case v2_0(DiasporaNodeInfo.v2_0.NodeInfo)
     /// NodeInfo schema version 2.1
@@ -15,8 +15,8 @@ public enum NodeInfo {
     /// Returns the version of the NodeInfo schema that is supported by the queried domain.
     public var version: WellKnownNodeInfoSchema {
         switch self {
-        case .v2_0: return .v2_0
-        case .v2_1: return .v2_1
+        case .v2_0: .v2_0
+        case .v2_1: .v2_1
         }
     }
 

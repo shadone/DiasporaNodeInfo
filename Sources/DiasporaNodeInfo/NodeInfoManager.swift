@@ -7,7 +7,12 @@
 import Foundation
 
 /// Main entry point for fetching node info.
-public struct NodeInfoManager {
+///
+/// `URLSession` and `JSONDecoder` are documented as thread-safe by Apple,
+/// so the manager is `@unchecked Sendable` for the benefit of callers on
+/// platforms older than iOS 16 / macOS 13 (where the SDK's own `Sendable`
+/// conformance on `URLSession` doesn't yet apply).
+public struct NodeInfoManager: @unchecked Sendable {
     // MARK: Public
 
     public enum Error: Swift.Error {
@@ -31,6 +36,9 @@ public struct NodeInfoManager {
         ///
         /// - Parameter underlayingError: the underlaying JSONDecoder error.
         case invalidResponse(underlayingError: Swift.Error)
+
+        /// The URL response was not an `HTTPURLResponse`.
+        case nonHTTPResponse
     }
 
     // MARK: Private
@@ -63,7 +71,7 @@ public struct NodeInfoManager {
         do {
             let (data, urlResponse) = try await session.data(for: request)
             guard let httpUrlResponse = urlResponse as? HTTPURLResponse else {
-                fatalError("Huh")
+                throw Error.nonHTTPResponse
             }
 
             let statusCode = httpUrlResponse.statusCode
@@ -140,7 +148,7 @@ public struct NodeInfoManager {
 
         let (data, urlResponse) = try await session.data(for: request)
         guard let httpUrlResponse = urlResponse as? HTTPURLResponse else {
-            fatalError("Huh")
+            throw Error.nonHTTPResponse
         }
 
         /// A server must provide the data at least in this media type. A server should set a

@@ -8,7 +8,7 @@ import Foundation
 
 public extension DiasporaNodeInfo.v2_1 {
     /// Usage statistics for this server.
-    struct Usage: Codable {
+    struct Usage: Codable, Sendable {
         /// Statistics about the users of this server.
         public let users: Users
 

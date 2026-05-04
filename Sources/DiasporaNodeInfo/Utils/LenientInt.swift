@@ -6,7 +6,7 @@
 
 import Foundation
 
-public struct LenientInt: Codable {
+public struct LenientInt: Codable, Sendable, Equatable {
     public let value: Int64?
 
     public init(from decoder: any Decoder) throws {
