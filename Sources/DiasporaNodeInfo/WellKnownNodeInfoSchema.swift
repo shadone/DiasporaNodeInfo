@@ -19,8 +19,8 @@ public enum WellKnownNodeInfoSchema: String, CustomDebugStringConvertible, Senda
     /// Returns the version string of the supported schema, e.g. `2.1`.
     public var shortVersionString: String {
         switch self {
-        case .v2_0: return "2.0"
-        case .v2_1: return "2.1"
+        case .v2_0: "2.0"
+        case .v2_1: "2.1"
         }
     }
 

@@ -15,8 +15,8 @@ public enum NodeInfo: Sendable {
     /// Returns the version of the NodeInfo schema that is supported by the queried domain.
     public var version: WellKnownNodeInfoSchema {
         switch self {
-        case .v2_0: return .v2_0
-        case .v2_1: return .v2_1
+        case .v2_0: .v2_0
+        case .v2_1: .v2_1
         }
     }
 
