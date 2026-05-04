@@ -7,17 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-05-04
+
 ### Added
 
-- none
+- All public schema types (`NodeInfo`, `v2_0/v2_1.NodeInfo`, `Software`,
+  `Usage`, `Users`, `Services`, `ProtocolType`, `InboundSite`,
+  `OutboundSite`), plus `JSON`, `LenientInt`, and `WellKnownNodeInfo`,
+  now conform to `Sendable`.
+- `ValueOrUnknown<Value>` gains a conditional `Sendable` conformance
+  (where `Value: Sendable, Value.RawValue: Sendable`).
+- `LenientInt` gains an `Equatable` conformance.
+- New `NodeInfoManager.Error.nonHTTPResponse` case for the previously
+  fatal cast-to-`HTTPURLResponse` failure path.
 
 ### Changed
 
-- Fixed output from the cli tool
+- Bumped `swift-tools-version` to 6.0 and the package to Swift 6
+  language mode. The previous experimental
+  `StrictConcurrency` and `DisableOutwardActorInference` settings are
+  subsumed by Swift 6 language mode and have been dropped.
+- `NodeInfoManager` is now `@unchecked Sendable` (URLSession + JSONDecoder
+  are documented thread-safe; the unchecked qualifier covers iOS 15 /
+  macOS 11 where the SDK's own conformance doesn't yet apply).
+- Replaced two `fatalError("Huh")` calls in `NodeInfoManager` with a
+  thrown `Error.nonHTTPResponse`.
+- Replaced a `preconditionFailure()` in `JSON`'s decoder fallback with a
+  proper `DecodingError.typeMismatch`.
+- Cleaned up redundant `return` keywords in single-expression switch
+  cases.
+- Fixed output from the cli tool.
 
 ### Removed
 
-- none
+- The `enableExperimentalFeature("StrictConcurrency")` and
+  `enableUpcomingFeature("DisableOutwardActorInference")` per-target
+  settings (now implicit at Swift 6 language mode).
 
 ## [1.2.0] - 2024-06-07
 
@@ -67,7 +92,8 @@ fail parsing nodeinfo, it should be acceptable.
 
 Initial release
 
-[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.2.0...HEAD
+[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.2...1.2.0
 [1.1.2]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.0...1.1.1
