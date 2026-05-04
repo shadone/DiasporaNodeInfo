@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-05-04
+
+### Fixed
+
+- `NodeInfoManager` discovery now picks the highest advertised schema
+  version per [spec][nodeinfo-protocol] rule 6. Previously the iteration
+  order was inverted and v2.0 was preferred over v2.1 when both were
+  advertised.
+- Treat any `5xx` status code as a transient failure
+  (`Error.temporaryUnavailable`) per spec rule 4, not just literal `500`.
+  Federated servers behind reverse proxies routinely surface 502 / 503 /
+  504 with the same retry semantics. Applied to both the discovery step
+  and the schema-fetch step.
+- Removed a DEBUG-only `assert` that required discovery responses to be
+  `application/json`. Spec rule 5 leaves the content type unspecified
+  and some servers serve `application/jrd+json` (RFC 8288); the decoder
+  parses the body as JSON regardless.
+
+### Changed
+
+- Dropped a redundant `do { … } catch { throw error }` wrapper in
+  `discoverNodeInfoUrlFromWellKnownNodeInfo` and tightened the
+  spec-rule comments.
+
+### Added
+
+- 12 new tests covering the discovery / fetch flow in `NodeInfoManager`
+  via a `URLProtocol`-based mock `URLSession` — schema version
+  selection, 4xx → `unsupported`, 5xx → `temporaryUnavailable`, and
+  `application/jrd+json` content type acceptance.
+
+[nodeinfo-protocol]: http://nodeinfo.diaspora.software/protocol.html
+
 ## [1.3.0] - 2026-05-04
 
 ### Added
@@ -92,7 +125,8 @@ fail parsing nodeinfo, it should be acceptable.
 
 Initial release
 
-[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.3.0...HEAD
+[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.4.0...HEAD
+[1.4.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.2...1.2.0
 [1.1.2]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.1...1.1.2
