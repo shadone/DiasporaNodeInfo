@@ -68,65 +68,64 @@ public struct NodeInfoManager: @unchecked Sendable {
         request.allHTTPHeaderFields = [
             "Accept": "application/json",
         ]
-        do {
-            let (data, urlResponse) = try await session.data(for: request)
-            guard let httpUrlResponse = urlResponse as? HTTPURLResponse else {
-                throw Error.nonHTTPResponse
-            }
-
-            let statusCode = httpUrlResponse.statusCode
-
-            /// The spec: http://nodeinfo.diaspora.software/protocol.html
-
-            /// 1. A client should first try the HTTPS protocol and fall back to HTTP on
-            /// connection errors or if it can’t validate the presented certificate.
-            /// **Implementation note**: We choose to ignore this.
-
-            /// 2. A client should follow redirections by the HTTP protocol.
-            /// **Implementation note**: Implemented by URLSession for us.
-
-            /// 3. A client should abandon the discovery on a HTTP response status code of 404 or 400
-            /// and may mark the host as not supporting the NodeInfo protocol.
-            if statusCode == 404 || statusCode == 400 {
-                throw Error.unsupported
-            }
-
-            /// 4. A client should retry discovery on server errors as indicated by the HTTP response
-            /// status code 500.
-            if statusCode == 500 {
-                // TODO: retry.
-                throw Error.temporaryUnavailable
-            }
-
-            /// 5. Discovery for media types other than application/json is left unspecified.
-            /// **Implementation note**: We ignore the mime type and try to parse response data as JSON.
-            assert(httpUrlResponse.mimeType == "application/json")
-
-            /// 6. A client should follow the link matching the highest schema version it supports.
-            let wellKnownNodeInfo = try jsonDecoder.decode(WellKnownNodeInfo.self, from: data)
-
-            let allKnownSchemas = WellKnownNodeInfoSchema.allOrderedSchemas.map(\.rawValue)
-            let allKnownLinksByRel = wellKnownNodeInfo.links
-                .filter { allKnownSchemas.contains($0.rel) }
-                .reduce(into: [String: WellKnownNodeInfo.Link]()) { partialResult, link in
-                    partialResult[link.rel] = link
-                }
-
-            let allKnownLinksOrdered = WellKnownNodeInfoSchema.allOrderedSchemas
-                .compactMap { schema -> WellKnownNodeInfo.Link? in
-                    allKnownLinksByRel[schema.rawValue]
-                }
-
-            if let link = allKnownLinksOrdered.first(where: { $0.href != nil }) {
-                return link.href!
-            }
-
-            let allSupportedSchemas = wellKnownNodeInfo.links.map(\.rel)
-            throw Error.supportedNodeInfoSchemaNotFound(schemas: allSupportedSchemas)
-        } catch {
-            // TODO: handle network errors?
-            throw error
+        let (data, urlResponse) = try await session.data(for: request)
+        guard let httpUrlResponse = urlResponse as? HTTPURLResponse else {
+            throw Error.nonHTTPResponse
         }
+
+        let statusCode = httpUrlResponse.statusCode
+
+        /// Spec: http://nodeinfo.diaspora.software/protocol.html
+
+        /// 1. A client should first try the HTTPS protocol and fall back to HTTP on
+        /// connection errors or if it can't validate the presented certificate.
+        /// **Implementation note**: We choose to ignore this — modern federated
+        /// servers should be on HTTPS, and silent HTTP fallback hides MITM risk.
+
+        /// 2. A client should follow redirections by the HTTP protocol.
+        /// **Implementation note**: Implemented by URLSession for us.
+
+        /// 3. A client should abandon the discovery on a HTTP response status code
+        /// of 404 or 400 and may mark the host as not supporting the NodeInfo protocol.
+        if statusCode == 404 || statusCode == 400 {
+            throw Error.unsupported
+        }
+
+        /// 4. A client should retry discovery on server errors as indicated by the
+        /// HTTP response status code 500.
+        /// **Implementation note**: Match the entire 5xx range, not just 500 —
+        /// federated servers behind reverse proxies routinely surface 502 / 503 / 504
+        /// for the same transient-failure semantics. Retry is left to the caller.
+        if (500 ... 599).contains(statusCode) {
+            throw Error.temporaryUnavailable
+        }
+
+        /// 5. Discovery for media types other than application/json is left
+        /// unspecified.
+        /// **Implementation note**: The spec leaves discovery's content type open,
+        /// so we don't validate `mimeType` here — `application/jrd+json` (RFC 8288)
+        /// is a valid alternative some servers send.
+
+        /// 6. A client should follow the link matching the highest schema version
+        /// it supports.
+        let wellKnownNodeInfo = try jsonDecoder.decode(WellKnownNodeInfo.self, from: data)
+
+        let linksByRel = wellKnownNodeInfo.links.reduce(
+            into: [String: WellKnownNodeInfo.Link]()
+        ) { partialResult, link in
+            partialResult[link.rel] = link
+        }
+
+        // Walk known schemas highest-first so we honour the spec's
+        // "follow the link matching the highest schema version".
+        for schema in WellKnownNodeInfoSchema.allOrderedSchemas.reversed() {
+            if let href = linksByRel[schema.rawValue]?.href {
+                return href
+            }
+        }
+
+        let allSupportedSchemas = wellKnownNodeInfo.links.map(\.rel)
+        throw Error.supportedNodeInfoSchemaNotFound(schemas: allSupportedSchemas)
     }
 
     /// Fetch node info for the given domain name.
@@ -163,8 +162,7 @@ public struct NodeInfoManager: @unchecked Sendable {
         if statusCode == 404 || statusCode == 400 {
             throw Error.unsupported
         }
-        if statusCode == 500 {
-            // TODO: retry.
+        if (500 ... 599).contains(statusCode) {
             throw Error.temporaryUnavailable
         }
 
