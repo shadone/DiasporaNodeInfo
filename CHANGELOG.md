@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-06
+
 ### Changed
 
 - Raised minimum deployment targets to iOS 18, macOS 15, watchOS 11,
@@ -151,7 +153,8 @@ fail parsing nodeinfo, it should be acceptable.
 
 Initial release
 
-[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.5.0...HEAD
+[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.5.0...2.0.0
 [1.5.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.2.0...1.3.0
