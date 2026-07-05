@@ -6,11 +6,11 @@ import PackageDescription
 let package = Package(
     name: "DiasporaNodeInfo",
     platforms: [
-        .iOS(.v15),
-        .macOS(.v11),
-        .watchOS(.v9),
-        .tvOS(.v15),
-        .visionOS(.v1),
+        .iOS(.v18),
+        .macOS(.v15),
+        .watchOS(.v11),
+        .tvOS(.v18),
+        .visionOS(.v2),
     ],
     products: [
         .library(
