@@ -4,11 +4,12 @@
 // SPDX-License-Identifier: BSD-2-Clause
 //
 
-import XCTest
+import Foundation
+import Testing
 @testable import DiasporaNodeInfo
 
-final class NodeInfo_v2_0_Tests: XCTestCase {
-    func testMastodonSocial() throws {
+struct NodeInfo_v2_0_Tests {
+    @Test func mastodonSocial() throws {
         let nodeInfoInput = """
         {
             "version": "2.0",
@@ -45,22 +46,22 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "mastodon")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "4.1.5+nightly-2023-07-28")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [])
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 1479509)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeMonth?.value, 470481)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeHalfyear?.value, 776979)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.localPosts?.value, 62251340)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.localComments?.value, nil)
-        XCTAssertEqual(nodeInfo.v2_0!.openRegistrations, true)
-        XCTAssertEqual(nodeInfo.v2_0!.metadata, [:])
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "mastodon")
+        #expect(nodeInfo.v2_0!.software.version == "4.1.5+nightly-2023-07-28")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
+        #expect(nodeInfo.v2_0!.services?.inbound == [])
+        #expect(nodeInfo.v2_0!.services?.outbound == [])
+        #expect(nodeInfo.v2_0!.usage.users.total?.value == 1479509)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 470481)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 776979)
+        #expect(nodeInfo.v2_0!.usage.localPosts?.value == 62251340)
+        #expect(nodeInfo.v2_0!.usage.localComments?.value == nil)
+        #expect(nodeInfo.v2_0!.openRegistrations == true)
+        #expect(nodeInfo.v2_0!.metadata == [:])
     }
 
-    func testPleroma() throws {
+    @Test func pleroma() throws {
         let nodeInfoInput = """
         {
             "metadata":
@@ -154,19 +155,19 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "pleroma")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "2.5.51-9314-g9528fc46-shitposterclub")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [])
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 3382)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeMonth?.value, 326)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeHalfyear?.value, 526)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.localPosts?.value, 2556018)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.localComments?.value, nil)
-        XCTAssertEqual(nodeInfo.v2_0!.openRegistrations, false)
-        XCTAssertEqual(nodeInfo.v2_0!.metadata, [
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "pleroma")
+        #expect(nodeInfo.v2_0!.software.version == "2.5.51-9314-g9528fc46-shitposterclub")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
+        #expect(nodeInfo.v2_0!.services?.inbound == [])
+        #expect(nodeInfo.v2_0!.services?.outbound == [])
+        #expect(nodeInfo.v2_0!.usage.users.total?.value == 3382)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 326)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 526)
+        #expect(nodeInfo.v2_0!.usage.localPosts?.value == 2556018)
+        #expect(nodeInfo.v2_0!.usage.localComments?.value == nil)
+        #expect(nodeInfo.v2_0!.openRegistrations == false)
+        #expect(nodeInfo.v2_0!.metadata == [
             "accountActivationRequired": .bool(false),
             "features": .array([
                 .string("pleroma_api"),
@@ -218,27 +219,27 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         ])
     }
 
-    func testLemmy() throws {
+    @Test func lemmy() throws {
         let nodeInfoInput = """
         {"version":"2.0","software":{"name":"lemmy","version":"0.18.5"},"protocols":["activitypub"],"usage":{"users":{"total":149738,"activeHalfyear":26917,"activeMonth":10536},"localPosts":234483,"localComments":1912053},"openRegistrations":true}
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
-        XCTAssertNil(nodeInfo.v2_0!.services)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 149738)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeMonth?.value, 10536)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeHalfyear?.value, 26917)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.localPosts?.value, 234483)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.localComments?.value, 1912053)
-        XCTAssertEqual(nodeInfo.v2_0!.openRegistrations, true)
-        XCTAssertEqual(nodeInfo.v2_0!.metadata, nil)
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "lemmy")
+        #expect(nodeInfo.v2_0!.software.version == "0.18.5")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
+        #expect(nodeInfo.v2_0!.services == nil)
+        #expect(nodeInfo.v2_0!.usage.users.total?.value == 149738)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 10536)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 26917)
+        #expect(nodeInfo.v2_0!.usage.localPosts?.value == 234483)
+        #expect(nodeInfo.v2_0!.usage.localComments?.value == 1912053)
+        #expect(nodeInfo.v2_0!.openRegistrations == true)
+        #expect(nodeInfo.v2_0!.metadata == nil)
     }
 
-    func testUnknownService() throws {
+    @Test func unknownService() throws {
         let nodeInfoInput = """
         {
           "version":"2.0",
@@ -254,16 +255,16 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
-        XCTAssertNotNil(nodeInfo.v2_0!.services)
-        XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "lemmy")
+        #expect(nodeInfo.v2_0!.software.version == "0.18.5")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
+        #expect(nodeInfo.v2_0!.services != nil)
+        #expect(nodeInfo.v2_0!.services?.inbound == [.value(.pumpio), .unknown("unexpected-inbound-service")])
+        #expect(nodeInfo.v2_0!.services?.outbound == [.value(.smtp), .unknown("unexpected-outbound-service")])
     }
 
-    func testUnknownProtocol() throws {
+    @Test func unknownProtocol() throws {
         let nodeInfoInput = """
         {
           "version":"2.0",
@@ -275,14 +276,14 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub), .unknown("hello-unknown-protocol")])
-        XCTAssertNil(nodeInfo.v2_0!.services)
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "lemmy")
+        #expect(nodeInfo.v2_0!.software.version == "0.18.5")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub), .unknown("hello-unknown-protocol")])
+        #expect(nodeInfo.v2_0!.services == nil)
     }
 
-    func testNoUsersFields() throws {
+    @Test func noUsersFields() throws {
         let nodeInfoInput = """
         {
           "version":"2.0",
@@ -301,16 +302,16 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
-        XCTAssertNotNil(nodeInfo.v2_0!.services)
-        XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "lemmy")
+        #expect(nodeInfo.v2_0!.software.version == "0.18.5")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
+        #expect(nodeInfo.v2_0!.services != nil)
+        #expect(nodeInfo.v2_0!.services?.inbound == [.value(.pumpio), .unknown("unexpected-inbound-service")])
+        #expect(nodeInfo.v2_0!.services?.outbound == [.value(.smtp), .unknown("unexpected-outbound-service")])
     }
 
-    func testUsersWithStrings() throws {
+    @Test func usersWithStrings() throws {
         // Some wordpress instances return usage.users.activeMonth as a string.
         // For example https://xn--y9aaaan6ae5bex1bccgcxbfc3mrbjd.xn--y9a3aq/wp-json/activitypub/1.0/nodeinfo
         let nodeInfoInput = """
@@ -336,15 +337,15 @@ final class NodeInfo_v2_0_Tests: XCTestCase {
         """.data(using: .utf8)!
 
         let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: nodeInfoInput)
-        XCTAssertEqual(nodeInfo.v2_0!.version, "2.0")
-        XCTAssertEqual(nodeInfo.v2_0!.software.name, "lemmy")
-        XCTAssertEqual(nodeInfo.v2_0!.software.version, "0.18.5")
-        XCTAssertEqual(nodeInfo.v2_0!.protocols, [.value(.activitypub)])
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.total?.value, 149738)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeHalfyear?.value, 26917)
-        XCTAssertEqual(nodeInfo.v2_0!.usage.users.activeMonth?.value, 10536)
-        XCTAssertNotNil(nodeInfo.v2_0!.services)
-        XCTAssertEqual(nodeInfo.v2_0!.services?.inbound, [.value(.pumpio), .unknown("unexpected-inbound-service")])
-        XCTAssertEqual(nodeInfo.v2_0!.services?.outbound, [.value(.smtp), .unknown("unexpected-outbound-service")])
+        #expect(nodeInfo.v2_0!.version == "2.0")
+        #expect(nodeInfo.v2_0!.software.name == "lemmy")
+        #expect(nodeInfo.v2_0!.software.version == "0.18.5")
+        #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
+        #expect(nodeInfo.v2_0!.usage.users.total?.value == 149738)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 26917)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 10536)
+        #expect(nodeInfo.v2_0!.services != nil)
+        #expect(nodeInfo.v2_0!.services?.inbound == [.value(.pumpio), .unknown("unexpected-inbound-service")])
+        #expect(nodeInfo.v2_0!.services?.outbound == [.value(.smtp), .unknown("unexpected-outbound-service")])
     }
 }

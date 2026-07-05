@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tvOS 18, visionOS 2 (breaking change).
 - `NodeInfoManager` is now nominally `Sendable` (previously
   `@unchecked Sendable`).
+- Migrated the test suite from XCTest to Swift Testing.
 
 ## [1.5.0] - 2026-07-06
 

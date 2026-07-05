@@ -5,37 +5,39 @@
 //
 
 import Foundation
-import XCTest
+import Testing
 @testable import DiasporaNodeInfo
 
 /// Exercises the discovery + fetch flow in ``NodeInfoManager`` against a
 /// stubbed `URLSession`. These tests are the regression net for the
 /// http://nodeinfo.diaspora.software/protocol.html spec rules — every
 /// rule we observe gets at least one test here.
-final class NodeInfoManagerTests: XCTestCase {
-    private var session: URLSession!
-    private var manager: NodeInfoManager!
+///
+/// `MockURLProtocol` below keeps its stub table in shared static state, so
+/// this suite must run its tests one at a time (`.serialized`) rather than
+/// Swift Testing's default parallel execution; `init`/`deinit` reset that
+/// shared state around every test, mirroring the old setUp/tearDown pair.
+@Suite(.serialized)
+final class NodeInfoManagerTests: Sendable {
+    private let session: URLSession
+    private let manager: NodeInfoManager
 
-    override func setUp() {
-        super.setUp()
+    init() {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         session = URLSession(configuration: config)
         manager = NodeInfoManager(session: session)
     }
 
-    override func tearDown() {
+    deinit {
         MockURLProtocol.reset()
-        session = nil
-        manager = nil
-        super.tearDown()
     }
 
     // MARK: - Rule 6: pick the highest supported schema version
 
     /// When the server advertises both 2.0 and 2.1, the 2.1 link must be
     /// followed (spec rule 6).
-    func test_discovery_picksHighestSchemaVersion_whenBothAdvertised() async throws {
+    @Test func discovery_picksHighestSchemaVersion_whenBothAdvertised() async throws {
         let twentyOneURL = URL(string: "https://example.org/nodeinfo/2.1")!
         let twentyURL = URL(string: "https://example.org/nodeinfo/2.0")!
 
@@ -49,18 +51,18 @@ final class NodeInfoManagerTests: XCTestCase {
             (200, nodeInfo21JSON())
         }
         MockURLProtocol.stub(url: twentyURL.absoluteString) { _ in
-            XCTFail("Should not have fetched 2.0 when 2.1 is available")
+            Issue.record("Should not have fetched 2.0 when 2.1 is available")
             return (500, Data())
         }
 
         let nodeinfo = try await manager.fetch(for: "example.org")
 
-        XCTAssertEqual(nodeinfo.version, .v2_1)
+        #expect(nodeinfo.version == .v2_1)
     }
 
     /// Reverse advertisement order — same expectation: 2.1 wins. Belt
     /// and braces against any quiet "iterate links in order" regression.
-    func test_discovery_picksHighestSchemaVersion_regardlessOfLinkOrder() async throws {
+    @Test func discovery_picksHighestSchemaVersion_regardlessOfLinkOrder() async throws {
         let twentyOneURL = URL(string: "https://example.org/nodeinfo/2.1")!
         let twentyURL = URL(string: "https://example.org/nodeinfo/2.0")!
 
@@ -76,11 +78,11 @@ final class NodeInfoManagerTests: XCTestCase {
 
         let nodeinfo = try await manager.fetch(for: "example.org")
 
-        XCTAssertEqual(nodeinfo.version, .v2_1)
+        #expect(nodeinfo.version == .v2_1)
     }
 
     /// When 2.1 is advertised but the link has no `href`, fall back to 2.0.
-    func test_discovery_fallsBackToLowerSchema_whenHigherHasNilHref() async throws {
+    @Test func discovery_fallsBackToLowerSchema_whenHigherHasNilHref() async throws {
         let twentyURL = URL(string: "https://example.org/nodeinfo/2.0")!
 
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
@@ -95,11 +97,11 @@ final class NodeInfoManagerTests: XCTestCase {
 
         let nodeinfo = try await manager.fetch(for: "example.org")
 
-        XCTAssertEqual(nodeinfo.version, .v2_0)
+        #expect(nodeinfo.version == .v2_0)
     }
 
     /// Only 2.0 advertised — pick it.
-    func test_discovery_picks20_whenOnly20Advertised() async throws {
+    @Test func discovery_picks20_whenOnly20Advertised() async throws {
         let twentyURL = URL(string: "https://example.org/nodeinfo/2.0")!
 
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
@@ -113,12 +115,12 @@ final class NodeInfoManagerTests: XCTestCase {
 
         let nodeinfo = try await manager.fetch(for: "example.org")
 
-        XCTAssertEqual(nodeinfo.version, .v2_0)
+        #expect(nodeinfo.version == .v2_0)
     }
 
     /// Only 1.0 / 1.1 advertised — we don't support those, throw the
     /// dedicated error and surface the rels back to the caller.
-    func test_discovery_throwsSchemaNotFound_whenOnlyUnsupportedVersionsAdvertised() async {
+    @Test func discovery_throwsSchemaNotFound_whenOnlyUnsupportedVersionsAdvertised() async {
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
             (200, jrdJSON([
                 ("http://nodeinfo.diaspora.software/ns/schema/1.0",
@@ -130,36 +132,36 @@ final class NodeInfoManagerTests: XCTestCase {
 
         do {
             _ = try await manager.fetch(for: "example.org")
-            XCTFail("Expected supportedNodeInfoSchemaNotFound")
+            Issue.record("Expected supportedNodeInfoSchemaNotFound")
         } catch let NodeInfoManager.Error.supportedNodeInfoSchemaNotFound(schemas) {
-            XCTAssertEqual(Set(schemas), [
+            #expect(Set(schemas) == [
                 "http://nodeinfo.diaspora.software/ns/schema/1.0",
                 "http://nodeinfo.diaspora.software/ns/schema/1.1",
             ])
         } catch {
-            XCTFail("Unexpected error: \(error)")
+            Issue.record("Unexpected error: \(error)")
         }
     }
 
     // MARK: - Rule 3: 404/400 → unsupported
 
-    func test_discovery_throwsUnsupported_on404() async {
+    @Test func discovery_throwsUnsupported_on404() async {
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
             (404, Data())
         }
 
-        await XCTAssertThrowsAsyncError(
+        await expectThrowsError(
             try await manager.fetch(for: "example.org"),
             expecting: NodeInfoManager.Error.unsupported
         )
     }
 
-    func test_discovery_throwsUnsupported_on400() async {
+    @Test func discovery_throwsUnsupported_on400() async {
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
             (400, Data())
         }
 
-        await XCTAssertThrowsAsyncError(
+        await expectThrowsError(
             try await manager.fetch(for: "example.org"),
             expecting: NodeInfoManager.Error.unsupported
         )
@@ -167,12 +169,12 @@ final class NodeInfoManagerTests: XCTestCase {
 
     // MARK: - Rule 4: any 5xx → temporaryUnavailable
 
-    func test_discovery_throwsTemporaryUnavailable_on500() async {
+    @Test func discovery_throwsTemporaryUnavailable_on500() async {
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
             (500, Data())
         }
 
-        await XCTAssertThrowsAsyncError(
+        await expectThrowsError(
             try await manager.fetch(for: "example.org"),
             expecting: NodeInfoManager.Error.temporaryUnavailable
         )
@@ -181,13 +183,13 @@ final class NodeInfoManagerTests: XCTestCase {
     /// Real Lemmy servers behind reverse proxies serve 502/503/504 on
     /// transient failure. Spec text only mentions 500, but the
     /// transient-failure semantics extend to the whole 5xx range.
-    func test_discovery_throwsTemporaryUnavailable_onAny5xx() async {
+    @Test func discovery_throwsTemporaryUnavailable_onAny5xx() async {
         for code in [500, 501, 502, 503, 504, 599] {
             MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
                 (code, Data())
             }
 
-            await XCTAssertThrowsAsyncError(
+            await expectThrowsError(
                 try await manager.fetch(for: "example.org"),
                 expecting: NodeInfoManager.Error.temporaryUnavailable,
                 "status \(code) should map to temporaryUnavailable"
@@ -195,7 +197,7 @@ final class NodeInfoManagerTests: XCTestCase {
         }
     }
 
-    func test_schemaFetch_throwsTemporaryUnavailable_onAny5xx() async {
+    @Test func schemaFetch_throwsTemporaryUnavailable_onAny5xx() async {
         let twentyOneURL = URL(string: "https://example.org/nodeinfo/2.1")!
 
         for code in [500, 502, 503, 504] {
@@ -209,7 +211,7 @@ final class NodeInfoManagerTests: XCTestCase {
                 (code, Data())
             }
 
-            await XCTAssertThrowsAsyncError(
+            await expectThrowsError(
                 try await manager.fetch(for: "example.org"),
                 expecting: NodeInfoManager.Error.temporaryUnavailable,
                 "schema fetch status \(code) should map to temporaryUnavailable"
@@ -221,7 +223,7 @@ final class NodeInfoManagerTests: XCTestCase {
 
     /// `application/jrd+json` is the RFC 8288 content type for JRD
     /// documents. The previous DEBUG-only `assert` would crash here.
-    func test_discovery_acceptsJRDJSONContentType() async throws {
+    @Test func discovery_acceptsJRDJSONContentType() async throws {
         let twentyOneURL = URL(string: "https://example.org/nodeinfo/2.1")!
 
         MockURLProtocol.stubWithContentType(url: "https://example.org/.well-known/nodeinfo") { _ in
@@ -235,7 +237,7 @@ final class NodeInfoManagerTests: XCTestCase {
 
         let nodeinfo = try await manager.fetch(for: "example.org")
 
-        XCTAssertEqual(nodeinfo.version, .v2_1)
+        #expect(nodeinfo.version == .v2_1)
     }
 
     // MARK: - Discovery decode failures wrap into invalidResponse
@@ -243,26 +245,26 @@ final class NodeInfoManagerTests: XCTestCase {
     /// A malformed JRD body (`links` is not an array of link objects) must
     /// surface as `Error.invalidResponse`, matching how `fetch(for:)` already
     /// wraps schema-document decode failures, not a raw `DecodingError`.
-    func test_discovery_wrapsMalformedJRD_inInvalidResponse() async {
+    @Test func discovery_wrapsMalformedJRD_inInvalidResponse() async {
         MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
             (200, Data(#"{"links": 42}"#.utf8))
         }
 
         do {
             _ = try await manager.fetch(for: "example.org")
-            XCTFail("Expected invalidResponse")
+            Issue.record("Expected invalidResponse")
         } catch NodeInfoManager.Error.invalidResponse {
             // expected
         } catch {
-            XCTFail("Expected invalidResponse, got \(error)")
+            Issue.record("Expected invalidResponse, got \(error)")
         }
     }
 
     // MARK: - Misc
 
-    func test_invalidDomain_throwsInvalidDomain() async {
+    @Test func invalidDomain_throwsInvalidDomain() async {
         // Whitespace in host can't be encoded by URLComponents.
-        await XCTAssertThrowsAsyncError(
+        await expectThrowsError(
             try await manager.fetch(for: "not a valid host"),
             expecting: NodeInfoManager.Error.invalidDomain
         )
@@ -270,7 +272,7 @@ final class NodeInfoManagerTests: XCTestCase {
 
     // MARK: - LocalizedError
 
-    func test_errorDescription_isNonEmpty_forAllCases() {
+    @Test func errorDescription_isNonEmpty_forAllCases() {
         let cases: [NodeInfoManager.Error] = [
             .invalidDomain,
             .unsupported,
@@ -282,8 +284,8 @@ final class NodeInfoManagerTests: XCTestCase {
 
         for error in cases {
             let description = error.errorDescription
-            XCTAssertNotNil(description, "\(error)")
-            XCTAssertFalse(description?.isEmpty ?? true, "\(error)")
+            #expect(description != nil, "\(error)")
+            #expect(description?.isEmpty == false, "\(error)")
         }
     }
 }
@@ -430,16 +432,15 @@ private extension MockURLProtocol {
 /// Asserts that `expression` throws an error matching `expected` on the
 /// `NodeInfoManager.Error` cases that don't carry an associated `Swift.Error`
 /// (which would block automatic Equatable synthesis).
-private func XCTAssertThrowsAsyncError<T>(
+private func expectThrowsError<T>(
     _ expression: @autoclosure () async throws -> T,
     expecting expected: NodeInfoManager.Error,
     _ message: String = "",
-    file: StaticString = #filePath,
-    line: UInt = #line
+    sourceLocation: SourceLocation = #_sourceLocation
 ) async {
     do {
         _ = try await expression()
-        XCTFail("Expected \(expected) but no error was thrown. \(message)", file: file, line: line)
+        Issue.record("Expected \(expected) but no error was thrown. \(message)", sourceLocation: sourceLocation)
     } catch let actual as NodeInfoManager.Error {
         switch (actual, expected) {
         case (.invalidDomain, .invalidDomain),
@@ -448,9 +449,9 @@ private func XCTAssertThrowsAsyncError<T>(
              (.nonHTTPResponse, .nonHTTPResponse):
             break
         default:
-            XCTFail("Expected \(expected), got \(actual). \(message)", file: file, line: line)
+            Issue.record("Expected \(expected), got \(actual). \(message)", sourceLocation: sourceLocation)
         }
     } catch {
-        XCTFail("Expected \(expected), got \(error). \(message)", file: file, line: line)
+        Issue.record("Expected \(expected), got \(error). \(message)", sourceLocation: sourceLocation)
     }
 }

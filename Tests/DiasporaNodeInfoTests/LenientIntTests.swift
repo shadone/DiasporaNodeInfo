@@ -4,11 +4,12 @@
 // SPDX-License-Identifier: BSD-2-Clause
 //
 
-import XCTest
+import Foundation
+import Testing
 @testable import DiasporaNodeInfo
 
-final class LenientIntTests: XCTestCase {
-    func testString() throws {
+struct LenientIntTests {
+    @Test func string() throws {
         struct Input: Decodable {
             let value1: LenientInt
             let value2: LenientInt
@@ -22,7 +23,7 @@ final class LenientIntTests: XCTestCase {
             """.data(using: .utf8)!
 
         let decoded = try JSONDecoder().decode(Input.self, from: input)
-        XCTAssertEqual(decoded.value1.value, 123)
-        XCTAssertEqual(decoded.value2.value, 234)
+        #expect(decoded.value1.value == 123)
+        #expect(decoded.value2.value == 234)
     }
 }
