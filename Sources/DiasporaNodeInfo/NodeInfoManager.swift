@@ -7,12 +7,7 @@
 import Foundation
 
 /// Main entry point for fetching node info.
-///
-/// `URLSession` and `JSONDecoder` are documented as thread-safe by Apple,
-/// so the manager is `@unchecked Sendable` for the benefit of callers on
-/// platforms older than iOS 16 / macOS 13 (where the SDK's own `Sendable`
-/// conformance on `URLSession` doesn't yet apply).
-public struct NodeInfoManager: @unchecked Sendable {
+public struct NodeInfoManager: Sendable {
     // MARK: Public
 
     public enum Error: Swift.Error {

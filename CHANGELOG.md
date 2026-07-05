@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Raised minimum deployment targets to iOS 18, macOS 15, watchOS 11,
+  tvOS 18, visionOS 2 (breaking change).
+- `NodeInfoManager` is now nominally `Sendable` (previously
+  `@unchecked Sendable`).
+
 ## [1.5.0] - 2026-07-06
 
 ### Fixed
