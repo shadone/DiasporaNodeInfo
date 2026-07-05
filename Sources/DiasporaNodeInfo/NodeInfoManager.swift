@@ -178,3 +178,22 @@ public struct NodeInfoManager: @unchecked Sendable {
         }
     }
 }
+
+extension NodeInfoManager.Error: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .invalidDomain:
+            "The domain is not a valid host name."
+        case .unsupported:
+            "The server does not support the NodeInfo protocol."
+        case let .supportedNodeInfoSchemaNotFound(schemas):
+            "The server does not advertise a NodeInfo schema supported by this library (advertised: \(schemas.joined(separator: ", ")))."
+        case .temporaryUnavailable:
+            "The server is temporarily unavailable. Try again later."
+        case let .invalidResponse(underlayingError):
+            "The server response could not be parsed. (\(underlayingError.localizedDescription))"
+        case .nonHTTPResponse:
+            "The server response was not an HTTP response."
+        }
+    }
+}

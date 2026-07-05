@@ -267,7 +267,28 @@ final class NodeInfoManagerTests: XCTestCase {
             expecting: NodeInfoManager.Error.invalidDomain
         )
     }
+
+    // MARK: - LocalizedError
+
+    func test_errorDescription_isNonEmpty_forAllCases() {
+        let cases: [NodeInfoManager.Error] = [
+            .invalidDomain,
+            .unsupported,
+            .supportedNodeInfoSchemaNotFound(schemas: ["http://nodeinfo.diaspora.software/ns/schema/1.0"]),
+            .temporaryUnavailable,
+            .invalidResponse(underlayingError: DummyError()),
+            .nonHTTPResponse,
+        ]
+
+        for error in cases {
+            let description = error.errorDescription
+            XCTAssertNotNil(description, "\(error)")
+            XCTAssertFalse(description?.isEmpty ?? true, "\(error)")
+        }
+    }
 }
+
+private struct DummyError: Swift.Error {}
 
 // MARK: - Fixtures
 
