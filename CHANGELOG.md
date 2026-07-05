@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-06
+
+### Fixed
+
+- CLI printed local comments with the "Local posts" label; CLI now
+  reports errors on stderr and exits non-zero on failure; malformed
+  `/.well-known/nodeinfo` documents now surface as
+  `NodeInfoManager.Error.invalidResponse` instead of a raw
+  `DecodingError`.
+
+### Added
+
+- `NodeInfoManager.Error` conforms to `LocalizedError`.
+
 ## [1.4.0] - 2026-05-04
 
 ### Fixed
@@ -125,7 +139,8 @@ fail parsing nodeinfo, it should be acceptable.
 
 Initial release
 
-[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.4.0...HEAD
+[unreleased]: https://github.com/shadone/DiasporaNodeInfo/compare/1.5.0...HEAD
+[1.5.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/shadone/DiasporaNodeInfo/compare/1.1.2...1.2.0
