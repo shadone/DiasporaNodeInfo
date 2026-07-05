@@ -53,6 +53,18 @@ let package = Package(
 )
 ```
 
+```swift
+import DiasporaNodeInfo
+
+let nodeInfo = try await NodeInfoManager().fetch(for: "mastodon.social")
+print(nodeInfo.version) // e.g. 2.1
+
+if let info = nodeInfo.v2_1 {
+    print(info.software.name, info.software.version)
+    print(info.openRegistrations)
+}
+```
+
 To use the command line you compile it or run with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
