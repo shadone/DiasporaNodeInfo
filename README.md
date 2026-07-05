@@ -40,7 +40,7 @@ import PackageDescription
 let package = Package(
     name: "Foobar",
     dependencies: [
-        .package(url: "https://github.com/shadone/DiasporaNodeInfo.git", from: "1.0.0"),
+        .package(url: "https://github.com/shadone/DiasporaNodeInfo.git", from: "2.0.0"),
     ],
     targets: [
         .executableTarget(
