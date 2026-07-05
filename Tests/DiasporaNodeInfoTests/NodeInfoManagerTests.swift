@@ -238,6 +238,26 @@ final class NodeInfoManagerTests: XCTestCase {
         XCTAssertEqual(nodeinfo.version, .v2_1)
     }
 
+    // MARK: - Discovery decode failures wrap into invalidResponse
+
+    /// A malformed JRD body (`links` is not an array of link objects) must
+    /// surface as `Error.invalidResponse`, matching how `fetch(for:)` already
+    /// wraps schema-document decode failures, not a raw `DecodingError`.
+    func test_discovery_wrapsMalformedJRD_inInvalidResponse() async {
+        MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
+            (200, Data(#"{"links": 42}"#.utf8))
+        }
+
+        do {
+            _ = try await manager.fetch(for: "example.org")
+            XCTFail("Expected invalidResponse")
+        } catch NodeInfoManager.Error.invalidResponse {
+            // expected
+        } catch {
+            XCTFail("Expected invalidResponse, got \(error)")
+        }
+    }
+
     // MARK: - Misc
 
     func test_invalidDomain_throwsInvalidDomain() async {

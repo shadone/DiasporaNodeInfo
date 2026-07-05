@@ -108,7 +108,12 @@ public struct NodeInfoManager: @unchecked Sendable {
 
         /// 6. A client should follow the link matching the highest schema version
         /// it supports.
-        let wellKnownNodeInfo = try jsonDecoder.decode(WellKnownNodeInfo.self, from: data)
+        let wellKnownNodeInfo: WellKnownNodeInfo
+        do {
+            wellKnownNodeInfo = try jsonDecoder.decode(WellKnownNodeInfo.self, from: data)
+        } catch {
+            throw Error.invalidResponse(underlayingError: error)
+        }
 
         let linksByRel = wellKnownNodeInfo.links.reduce(
             into: [String: WellKnownNodeInfo.Link]()
