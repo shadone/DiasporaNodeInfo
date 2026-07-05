@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `@unchecked Sendable`).
 - Migrated the test suite from XCTest to Swift Testing.
 
+### Fixed
+
+- CLI prints the underlying decoding error detail when a response cannot be parsed.
+
 ## [1.5.0] - 2026-07-06
 
 ### Fixed
