@@ -278,7 +278,7 @@ final class NodeInfoManagerTests: Sendable {
             .unsupported,
             .supportedNodeInfoSchemaNotFound(schemas: ["http://nodeinfo.diaspora.software/ns/schema/1.0"]),
             .temporaryUnavailable,
-            .invalidResponse(underlayingError: DummyError()),
+            .invalidResponse(underlyingError: DummyError()),
             .nonHTTPResponse,
         ]
 

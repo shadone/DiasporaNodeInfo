@@ -29,8 +29,8 @@ public struct NodeInfoManager: Sendable {
 
         /// The server response cannot be parsed.
         ///
-        /// - Parameter underlayingError: the underlaying JSONDecoder error.
-        case invalidResponse(underlayingError: Swift.Error)
+        /// - Parameter underlyingError: the underlying JSONDecoder error.
+        case invalidResponse(underlyingError: Swift.Error)
 
         /// The URL response was not an `HTTPURLResponse`.
         case nonHTTPResponse
@@ -107,7 +107,7 @@ public struct NodeInfoManager: Sendable {
         do {
             wellKnownNodeInfo = try jsonDecoder.decode(WellKnownNodeInfo.self, from: data)
         } catch {
-            throw Error.invalidResponse(underlayingError: error)
+            throw Error.invalidResponse(underlyingError: error)
         }
 
         let linksByRel = wellKnownNodeInfo.links.reduce(
@@ -169,7 +169,7 @@ public struct NodeInfoManager: Sendable {
         do {
             return try jsonDecoder.decode(NodeInfo.self, from: data)
         } catch {
-            throw Error.invalidResponse(underlayingError: error)
+            throw Error.invalidResponse(underlyingError: error)
         }
     }
 }
@@ -185,8 +185,8 @@ extension NodeInfoManager.Error: LocalizedError {
             "The server does not advertise a NodeInfo schema supported by this library (advertised: \(schemas.joined(separator: ", ")))."
         case .temporaryUnavailable:
             "The server is temporarily unavailable. Try again later."
-        case let .invalidResponse(underlayingError):
-            "The server response could not be parsed. (\(underlayingError.localizedDescription))"
+        case let .invalidResponse(underlyingError):
+            "The server response could not be parsed. (\(underlyingError.localizedDescription))"
         case .nonHTTPResponse:
             "The server response was not an HTTP response."
         }
