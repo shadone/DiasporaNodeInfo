@@ -16,16 +16,7 @@ struct NodeInfoCLI: AsyncParsableCommand {
     mutating func run() async throws {
         do {
             let nodeinfo = try await NodeInfoManager().fetch(for: domain)
-
-            let summary: Summary
-            switch nodeinfo {
-            case let .v2_0(payload):
-                summary = Summary(payload)
-            case let .v2_1(payload):
-                summary = Summary(payload)
-            }
-
-            printSummary(summary, domain: domain)
+            printSummary(nodeinfo, domain: domain)
         } catch {
             reportError("'\(domain)': \(error.localizedDescription)")
             switch error {
@@ -39,92 +30,56 @@ struct NodeInfoCLI: AsyncParsableCommand {
         }
     }
 
-    /// A flattened view of either schema version's fields, so printing only
-    /// has to be written once.
-    private struct Summary {
-        let schemaVersion: String
-        let softwareName: String
-        let softwareVersion: String
-        let homepage: String?
-        let repository: String?
-        let protocols: [String]
-        let usersTotal: Int64?
-        let usersActiveMonth: Int64?
-        let usersActiveHalfyear: Int64?
-        let localPosts: Int64?
-        let localComments: Int64?
-        let openRegistrations: Bool
-        let metadata: [String: JSON]?
-
-        init(_ nodeinfo: DiasporaNodeInfo.v2_0.NodeInfo) {
-            schemaVersion = nodeinfo.version
-            softwareName = nodeinfo.software.name
-            softwareVersion = nodeinfo.software.version
-            homepage = nil
-            repository = nil
-            protocols = nodeinfo.protocols.map(\.debugDescription)
-            usersTotal = nodeinfo.usage.users.total
-            usersActiveMonth = nodeinfo.usage.users.activeMonth
-            usersActiveHalfyear = nodeinfo.usage.users.activeHalfyear
-            localPosts = nodeinfo.usage.localPosts
-            localComments = nodeinfo.usage.localComments
-            openRegistrations = nodeinfo.openRegistrations
-            metadata = nodeinfo.metadata
-        }
-
-        init(_ nodeinfo: DiasporaNodeInfo.v2_1.NodeInfo) {
-            schemaVersion = nodeinfo.version
-            softwareName = nodeinfo.software.name
-            softwareVersion = nodeinfo.software.version
-            homepage = nodeinfo.software.homepage
-            repository = nodeinfo.software.repository
-            protocols = nodeinfo.protocols.map(\.debugDescription)
-            usersTotal = nodeinfo.usage.users.total
-            usersActiveMonth = nodeinfo.usage.users.activeMonth
-            usersActiveHalfyear = nodeinfo.usage.users.activeHalfyear
-            localPosts = nodeinfo.usage.localPosts
-            localComments = nodeinfo.usage.localComments
-            openRegistrations = nodeinfo.openRegistrations
-            metadata = nodeinfo.metadata
-        }
-    }
-
-    private func printSummary(_ summary: Summary, domain: String) {
+    private func printSummary(_ nodeinfo: NodeInfo, domain: String) {
         print("\(domain):")
-        print("\tSchema: \(summary.schemaVersion)")
+        print("\tSchema: \(nodeinfo.version.shortVersionString)")
 
         print("\tSoftware:")
-        print("\t\tName: \(summary.softwareName)")
-        print("\t\tVersion: \(summary.softwareVersion)")
-        if let homepage = summary.homepage {
+        print("\t\tName: \(nodeinfo.softwareName)")
+        print("\t\tVersion: \(nodeinfo.softwareVersion)")
+        if let homepage = nodeinfo.softwareHomepage {
             print("\t\tHomepage: \(homepage)")
         }
-        if let repository = summary.repository {
+        if let repository = nodeinfo.softwareRepository {
             print("\t\tRepo: \(repository)")
         }
 
-        print("\tProtocols: \(summary.protocols.joined(separator: ", "))")
+        // Protocols are rendered with their friendly `debugDescription` (e.g.
+        // "ActivityPub") rather than the version-agnostic `protocolNames`
+        // (raw values, e.g. "activitypub"), and metadata has no
+        // version-agnostic accessor at all: both stay a payload-level read.
+        let protocolDescriptions: [String]
+        let metadata: [String: JSON]?
+        switch nodeinfo {
+        case let .v2_0(payload):
+            protocolDescriptions = payload.protocols.map(\.debugDescription)
+            metadata = payload.metadata
+        case let .v2_1(payload):
+            protocolDescriptions = payload.protocols.map(\.debugDescription)
+            metadata = payload.metadata
+        }
+        print("\tProtocols: \(protocolDescriptions.joined(separator: ", "))")
 
         print("\tUsage:")
-        if let total = summary.usersTotal {
+        if let total = nodeinfo.usersTotal {
             print("\t\tUsers (total): \(total)")
         }
-        if let activeMonth = summary.usersActiveMonth {
+        if let activeMonth = nodeinfo.usersActiveMonth {
             print("\t\tUsers (active last month): \(activeMonth)")
         }
-        if let activeHalfyear = summary.usersActiveHalfyear {
+        if let activeHalfyear = nodeinfo.usersActiveHalfyear {
             print("\t\tUsers (active last 6 months): \(activeHalfyear)")
         }
-        if let localPosts = summary.localPosts {
+        if let localPosts = nodeinfo.localPosts {
             print("\t\tLocal posts: \(localPosts)")
         }
-        if let localComments = summary.localComments {
+        if let localComments = nodeinfo.localComments {
             print("\t\tLocal comments: \(localComments)")
         }
 
-        print("\tOpen Registration: \(summary.openRegistrations ? "yes" : "no")")
+        print("\tOpen Registration: \(nodeinfo.openRegistrations ? "yes" : "no")")
 
-        if let metadata = summary.metadata, !metadata.isEmpty {
+        if let metadata, !metadata.isEmpty {
             print("\tMetadata:")
             for (key, value) in metadata {
                 print("\t\t\(key): \(dump(value))")

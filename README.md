@@ -59,9 +59,16 @@ import DiasporaNodeInfo
 let nodeInfo = try await NodeInfoManager().fetch(for: "mastodon.social")
 print(nodeInfo.version) // e.g. 2.1
 
+// Version-agnostic convenience accessors work across both schema versions;
+// fields a schema version lacks come back nil (homepage is nil on 2.0).
+print(nodeInfo.softwareName, nodeInfo.softwareVersion)
+print(nodeInfo.openRegistrations)
+print(nodeInfo.softwareHomepage ?? "no homepage")
+
+// Payload-only surfaces (metadata, services, the typed protocols arrays)
+// are still reached via the schema-specific payload.
 if let info = nodeInfo.v2_1 {
-    print(info.software.name, info.software.version)
-    print(info.openRegistrations)
+    print(info.metadata ?? [:])
 }
 ```
 
