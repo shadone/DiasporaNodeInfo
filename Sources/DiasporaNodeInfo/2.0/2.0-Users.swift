@@ -37,5 +37,12 @@ public extension DiasporaNodeInfo.v2_0 {
             try container.encodeIfPresent(activeHalfyear, forKey: .activeHalfyear)
             try container.encodeIfPresent(activeMonth, forKey: .activeMonth)
         }
+
+        /// Creates a value for testing or fixture purposes.
+        public init(total: Int64? = nil, activeHalfyear: Int64? = nil, activeMonth: Int64? = nil) {
+            self.total = total
+            self.activeHalfyear = activeHalfyear
+            self.activeMonth = activeMonth
+        }
     }
 }

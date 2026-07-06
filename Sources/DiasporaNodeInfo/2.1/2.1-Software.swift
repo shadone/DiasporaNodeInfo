@@ -20,5 +20,13 @@ public extension DiasporaNodeInfo.v2_1 {
 
         /// The url of the homepage of this server software.
         public let homepage: String?
+
+        /// Creates a value for testing or fixture purposes.
+        public init(name: String, version: String, repository: String? = nil, homepage: String? = nil) {
+            self.name = name
+            self.version = version
+            self.repository = repository
+            self.homepage = homepage
+        }
     }
 }

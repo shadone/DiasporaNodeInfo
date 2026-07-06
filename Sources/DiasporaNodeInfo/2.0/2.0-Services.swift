@@ -14,5 +14,11 @@ public extension DiasporaNodeInfo.v2_0 {
 
         /// The third party sites this server can publish messages to on the behalf of a user.
         public let outbound: [ValueOrUnknown<OutboundSite>]
+
+        /// Creates a value for testing or fixture purposes.
+        public init(inbound: [ValueOrUnknown<InboundSite>], outbound: [ValueOrUnknown<OutboundSite>]) {
+            self.inbound = inbound
+            self.outbound = outbound
+        }
     }
 }

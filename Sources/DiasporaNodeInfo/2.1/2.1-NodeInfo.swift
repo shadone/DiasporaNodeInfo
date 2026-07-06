@@ -33,5 +33,24 @@ public extension DiasporaNodeInfo.v2_1 {
         ///
         /// - Note: the spec defines this as mandatory field but Lemmy ignores it as of `0.19`
         public let metadata: [String: JSON]?
+
+        /// Creates a value for testing or fixture purposes.
+        public init(
+            version: String,
+            software: Software,
+            protocols: [ValueOrUnknown<ProtocolType>],
+            services: Services? = nil,
+            openRegistrations: Bool,
+            usage: Usage,
+            metadata: [String: JSON]? = nil
+        ) {
+            self.version = version
+            self.software = software
+            self.protocols = protocols
+            self.services = services
+            self.openRegistrations = openRegistrations
+            self.usage = usage
+            self.metadata = metadata
+        }
     }
 }

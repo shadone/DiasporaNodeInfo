@@ -37,5 +37,12 @@ public extension DiasporaNodeInfo.v2_0 {
             try container.encodeIfPresent(localPosts, forKey: .localPosts)
             try container.encodeIfPresent(localComments, forKey: .localComments)
         }
+
+        /// Creates a value for testing or fixture purposes.
+        public init(users: Users, localPosts: Int64? = nil, localComments: Int64? = nil) {
+            self.users = users
+            self.localPosts = localPosts
+            self.localComments = localComments
+        }
     }
 }

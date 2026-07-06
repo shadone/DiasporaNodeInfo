@@ -14,5 +14,11 @@ public extension DiasporaNodeInfo.v2_0 {
 
         /// The version of this server software.
         public let version: String
+
+        /// Creates a value for testing or fixture purposes.
+        public init(name: String, version: String) {
+            self.name = name
+            self.version = version
+        }
     }
 }

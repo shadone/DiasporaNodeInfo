@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `usersActiveHalfyear`, `localPosts`, `localComments`) so callers no
   longer need to switch on the schema version for fields shared across
   `v2_0`/`v2_1`.
+- Public memberwise initializers on `v2_0`/`v2_1` `NodeInfo`, `Software`,
+  `Usage`, `Users`, and `Services` for building fixtures in tests.
 
 ### Changed
 
