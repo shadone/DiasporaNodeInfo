@@ -63,11 +63,11 @@ struct NodeInfoCLI: AsyncParsableCommand {
             homepage = nil
             repository = nil
             protocols = nodeinfo.protocols.map(\.debugDescription)
-            usersTotal = nodeinfo.usage.users.total?.value
-            usersActiveMonth = nodeinfo.usage.users.activeMonth?.value
-            usersActiveHalfyear = nodeinfo.usage.users.activeHalfyear?.value
-            localPosts = nodeinfo.usage.localPosts?.value
-            localComments = nodeinfo.usage.localComments?.value
+            usersTotal = nodeinfo.usage.users.total
+            usersActiveMonth = nodeinfo.usage.users.activeMonth
+            usersActiveHalfyear = nodeinfo.usage.users.activeHalfyear
+            localPosts = nodeinfo.usage.localPosts
+            localComments = nodeinfo.usage.localComments
             openRegistrations = nodeinfo.openRegistrations
             metadata = nodeinfo.metadata
         }
@@ -79,11 +79,11 @@ struct NodeInfoCLI: AsyncParsableCommand {
             homepage = nodeinfo.software.homepage
             repository = nodeinfo.software.repository
             protocols = nodeinfo.protocols.map(\.debugDescription)
-            usersTotal = nodeinfo.usage.users.total?.value
-            usersActiveMonth = nodeinfo.usage.users.activeMonth?.value
-            usersActiveHalfyear = nodeinfo.usage.users.activeHalfyear?.value
-            localPosts = nodeinfo.usage.localPosts?.value
-            localComments = nodeinfo.usage.localComments?.value
+            usersTotal = nodeinfo.usage.users.total
+            usersActiveMonth = nodeinfo.usage.users.activeMonth
+            usersActiveHalfyear = nodeinfo.usage.users.activeHalfyear
+            localPosts = nodeinfo.usage.localPosts
+            localComments = nodeinfo.usage.localComments
             openRegistrations = nodeinfo.openRegistrations
             metadata = nodeinfo.metadata
         }

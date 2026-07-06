@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fetch(for:)` now uses typed throws (`throws(NodeInfoManager.Error)`);
   transport failures are wrapped in the new `Error.network(underlyingError:)`
   case instead of escaping untyped (breaking).
+- Usage counters (`Usage.localPosts`, `Usage.localComments`,
+  `Users.total`, `Users.activeHalfyear`, `Users.activeMonth` on both
+  `v2_0` and `v2_1`) are now plain `Int64?`, decoded leniently in place;
+  the public `LenientInt` wrapper is removed (breaking).
 
 ### Fixed
 

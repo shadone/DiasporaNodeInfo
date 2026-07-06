@@ -52,11 +52,11 @@ struct NodeInfo_v2_0_Tests {
         #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
         #expect(nodeInfo.v2_0!.services?.inbound == [])
         #expect(nodeInfo.v2_0!.services?.outbound == [])
-        #expect(nodeInfo.v2_0!.usage.users.total?.value == 1479509)
-        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 470481)
-        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 776979)
-        #expect(nodeInfo.v2_0!.usage.localPosts?.value == 62251340)
-        #expect(nodeInfo.v2_0!.usage.localComments?.value == nil)
+        #expect(nodeInfo.v2_0!.usage.users.total == 1479509)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth == 470481)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear == 776979)
+        #expect(nodeInfo.v2_0!.usage.localPosts == 62251340)
+        #expect(nodeInfo.v2_0!.usage.localComments == nil)
         #expect(nodeInfo.v2_0!.openRegistrations == true)
         #expect(nodeInfo.v2_0!.metadata == [:])
     }
@@ -161,11 +161,11 @@ struct NodeInfo_v2_0_Tests {
         #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
         #expect(nodeInfo.v2_0!.services?.inbound == [])
         #expect(nodeInfo.v2_0!.services?.outbound == [])
-        #expect(nodeInfo.v2_0!.usage.users.total?.value == 3382)
-        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 326)
-        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 526)
-        #expect(nodeInfo.v2_0!.usage.localPosts?.value == 2556018)
-        #expect(nodeInfo.v2_0!.usage.localComments?.value == nil)
+        #expect(nodeInfo.v2_0!.usage.users.total == 3382)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth == 326)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear == 526)
+        #expect(nodeInfo.v2_0!.usage.localPosts == 2556018)
+        #expect(nodeInfo.v2_0!.usage.localComments == nil)
         #expect(nodeInfo.v2_0!.openRegistrations == false)
         #expect(nodeInfo.v2_0!.metadata == [
             "accountActivationRequired": .bool(false),
@@ -230,11 +230,11 @@ struct NodeInfo_v2_0_Tests {
         #expect(nodeInfo.v2_0!.software.version == "0.18.5")
         #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
         #expect(nodeInfo.v2_0!.services == nil)
-        #expect(nodeInfo.v2_0!.usage.users.total?.value == 149738)
-        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 10536)
-        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 26917)
-        #expect(nodeInfo.v2_0!.usage.localPosts?.value == 234483)
-        #expect(nodeInfo.v2_0!.usage.localComments?.value == 1912053)
+        #expect(nodeInfo.v2_0!.usage.users.total == 149738)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth == 10536)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear == 26917)
+        #expect(nodeInfo.v2_0!.usage.localPosts == 234483)
+        #expect(nodeInfo.v2_0!.usage.localComments == 1912053)
         #expect(nodeInfo.v2_0!.openRegistrations == true)
         #expect(nodeInfo.v2_0!.metadata == nil)
     }
@@ -341,11 +341,124 @@ struct NodeInfo_v2_0_Tests {
         #expect(nodeInfo.v2_0!.software.name == "lemmy")
         #expect(nodeInfo.v2_0!.software.version == "0.18.5")
         #expect(nodeInfo.v2_0!.protocols == [.value(.activitypub)])
-        #expect(nodeInfo.v2_0!.usage.users.total?.value == 149738)
-        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear?.value == 26917)
-        #expect(nodeInfo.v2_0!.usage.users.activeMonth?.value == 10536)
+        #expect(nodeInfo.v2_0!.usage.users.total == 149738)
+        #expect(nodeInfo.v2_0!.usage.users.activeHalfyear == 26917)
+        #expect(nodeInfo.v2_0!.usage.users.activeMonth == 10536)
         #expect(nodeInfo.v2_0!.services != nil)
         #expect(nodeInfo.v2_0!.services?.inbound == [.value(.pumpio), .unknown("unexpected-inbound-service")])
         #expect(nodeInfo.v2_0!.services?.outbound == [.value(.smtp), .unknown("unexpected-outbound-service")])
+    }
+
+    @Test func usageCountersPlainInt() throws {
+        let usageInput = """
+        {
+          "users": {
+            "total": 149738,
+            "activeHalfyear": 26917,
+            "activeMonth": 10536
+          },
+          "localPosts": 234483,
+          "localComments": 1912053
+        }
+        """.data(using: .utf8)!
+
+        let usage = try JSONDecoder().decode(DiasporaNodeInfo.v2_0.Usage.self, from: usageInput)
+        #expect(usage.users.total == 149738)
+        #expect(usage.users.activeHalfyear == 26917)
+        #expect(usage.users.activeMonth == 10536)
+        #expect(usage.localPosts == 234483)
+        #expect(usage.localComments == 1912053)
+    }
+
+    @Test func usageCountersStringInt() throws {
+        // Some wordpress instances return usage counters as strings.
+        let usageInput = """
+        {
+          "users": {
+            "total": "149738",
+            "activeHalfyear": "26917",
+            "activeMonth": "10536"
+          },
+          "localPosts": "234483",
+          "localComments": "1912053"
+        }
+        """.data(using: .utf8)!
+
+        let usage = try JSONDecoder().decode(DiasporaNodeInfo.v2_0.Usage.self, from: usageInput)
+        #expect(usage.users.total == 149738)
+        #expect(usage.users.activeHalfyear == 26917)
+        #expect(usage.users.activeMonth == 10536)
+        #expect(usage.localPosts == 234483)
+        #expect(usage.localComments == 1912053)
+    }
+
+    @Test func usageCountersGarbageToNil() throws {
+        let usageInput = """
+        {
+          "users": {
+            "total": true,
+            "activeHalfyear": 12.5,
+            "activeMonth": "not-a-number"
+          },
+          "localPosts": null,
+          "localComments": false
+        }
+        """.data(using: .utf8)!
+
+        let usage = try JSONDecoder().decode(DiasporaNodeInfo.v2_0.Usage.self, from: usageInput)
+        #expect(usage.users.total == nil)
+        #expect(usage.users.activeHalfyear == nil)
+        #expect(usage.users.activeMonth == nil)
+        #expect(usage.localPosts == nil)
+        #expect(usage.localComments == nil)
+    }
+
+    @Test func usageCountersMissingKeysAreNil() throws {
+        let usageInput = """
+        {
+          "users": {
+          }
+        }
+        """.data(using: .utf8)!
+
+        let usage = try JSONDecoder().decode(DiasporaNodeInfo.v2_0.Usage.self, from: usageInput)
+        #expect(usage.users.total == nil)
+        #expect(usage.users.activeHalfyear == nil)
+        #expect(usage.users.activeMonth == nil)
+        #expect(usage.localPosts == nil)
+        #expect(usage.localComments == nil)
+    }
+
+    @Test func usageCountersRoundTripEncoding() throws {
+        // activeHalfyear and localComments are absent so their keys must be
+        // omitted on re-encode; activeMonth arrives as a string and must be
+        // normalized to a JSON integer.
+        let usageInput = """
+        {
+          "users": {
+            "total": 149738,
+            "activeMonth": "10536"
+          },
+          "localPosts": 234483
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(DiasporaNodeInfo.v2_0.Usage.self, from: usageInput)
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let encoded = try encoder.encode(decoded)
+
+        // Non-nil counters are emitted as JSON integers; nil counters
+        // (activeHalfyear, localComments) are omitted entirely.
+        #expect(String(decoding: encoded, as: UTF8.self) ==
+            #"{"localPosts":234483,"users":{"activeMonth":10536,"total":149738}}"#)
+
+        let redecoded = try JSONDecoder().decode(DiasporaNodeInfo.v2_0.Usage.self, from: encoded)
+        #expect(redecoded.users.total == decoded.users.total)
+        #expect(redecoded.users.activeHalfyear == decoded.users.activeHalfyear)
+        #expect(redecoded.users.activeMonth == decoded.users.activeMonth)
+        #expect(redecoded.localPosts == decoded.localPosts)
+        #expect(redecoded.localComments == decoded.localComments)
     }
 }

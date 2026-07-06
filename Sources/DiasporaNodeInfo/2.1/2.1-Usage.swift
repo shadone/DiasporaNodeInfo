@@ -13,9 +13,29 @@ public extension DiasporaNodeInfo.v2_1 {
         public let users: Users
 
         /// The amount of posts that were made by users that are registered on this server.
-        public let localPosts: LenientInt?
+        public let localPosts: Int64?
 
         /// The amount of comments that were made by users that are registered on this server.
-        public let localComments: LenientInt?
+        public let localComments: Int64?
+
+        private enum CodingKeys: String, CodingKey {
+            case users
+            case localPosts
+            case localComments
+        }
+
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            users = try container.decode(Users.self, forKey: .users)
+            localPosts = container.decodeLenientInt64IfPresent(forKey: .localPosts)
+            localComments = container.decodeLenientInt64IfPresent(forKey: .localComments)
+        }
+
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(users, forKey: .users)
+            try container.encodeIfPresent(localPosts, forKey: .localPosts)
+            try container.encodeIfPresent(localComments, forKey: .localComments)
+        }
     }
 }

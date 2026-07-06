@@ -56,11 +56,11 @@ struct NodeInfo_v2_1_Tests {
         #expect(nodeInfo.v2_1!.protocols == [.value(.activitypub)])
         #expect(nodeInfo.v2_1!.services?.inbound == [])
         #expect(nodeInfo.v2_1!.services?.outbound == [])
-        #expect(nodeInfo.v2_1!.usage.users.total?.value == 1)
-        #expect(nodeInfo.v2_1!.usage.users.activeMonth?.value == 2)
-        #expect(nodeInfo.v2_1!.usage.users.activeHalfyear?.value == 3)
-        #expect(nodeInfo.v2_1!.usage.localPosts?.value == 42)
-        #expect(nodeInfo.v2_1!.usage.localComments?.value == nil)
+        #expect(nodeInfo.v2_1!.usage.users.total == 1)
+        #expect(nodeInfo.v2_1!.usage.users.activeMonth == 2)
+        #expect(nodeInfo.v2_1!.usage.users.activeHalfyear == 3)
+        #expect(nodeInfo.v2_1!.usage.localPosts == 42)
+        #expect(nodeInfo.v2_1!.usage.localComments == nil)
         #expect(nodeInfo.v2_1!.openRegistrations == true)
         #expect(nodeInfo.v2_1!.metadata == [:])
     }
@@ -167,11 +167,44 @@ struct NodeInfo_v2_1_Tests {
         #expect(nodeInfo.v2_1!.software.name == "lemmy")
         #expect(nodeInfo.v2_1!.software.version == "0.18.5")
         #expect(nodeInfo.v2_1!.protocols == [.value(.activitypub)])
-        #expect(nodeInfo.v2_1!.usage.users.total?.value == 149738)
-        #expect(nodeInfo.v2_1!.usage.users.activeHalfyear?.value == 26917)
-        #expect(nodeInfo.v2_1!.usage.users.activeMonth?.value == 10536)
+        #expect(nodeInfo.v2_1!.usage.users.total == 149738)
+        #expect(nodeInfo.v2_1!.usage.users.activeHalfyear == 26917)
+        #expect(nodeInfo.v2_1!.usage.users.activeMonth == 10536)
         #expect(nodeInfo.v2_1!.services != nil)
         #expect(nodeInfo.v2_1!.services?.inbound == [.value(.pumpio), .unknown("unexpected-inbound-service")])
         #expect(nodeInfo.v2_1!.services?.outbound == [.value(.smtp), .unknown("unexpected-outbound-service")])
+    }
+
+    @Test func usageCountersRoundTripEncoding() throws {
+        // activeHalfyear and localComments are absent so their keys must be
+        // omitted on re-encode; activeMonth arrives as a string and must be
+        // normalized to a JSON integer.
+        let usageInput = """
+        {
+          "users": {
+            "total": 149738,
+            "activeMonth": "10536"
+          },
+          "localPosts": 234483
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(DiasporaNodeInfo.v2_1.Usage.self, from: usageInput)
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let encoded = try encoder.encode(decoded)
+
+        // Non-nil counters are emitted as JSON integers; nil counters
+        // (activeHalfyear, localComments) are omitted entirely.
+        #expect(String(decoding: encoded, as: UTF8.self) ==
+            #"{"localPosts":234483,"users":{"activeMonth":10536,"total":149738}}"#)
+
+        let redecoded = try JSONDecoder().decode(DiasporaNodeInfo.v2_1.Usage.self, from: encoded)
+        #expect(redecoded.users.total == decoded.users.total)
+        #expect(redecoded.users.activeHalfyear == decoded.users.activeHalfyear)
+        #expect(redecoded.users.activeMonth == decoded.users.activeMonth)
+        #expect(redecoded.localPosts == decoded.localPosts)
+        #expect(redecoded.localComments == decoded.localComments)
     }
 }
