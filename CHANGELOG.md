@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-06
+
 ### Added
 
 - Version-agnostic convenience accessors on `NodeInfo` (`softwareName`,
@@ -27,16 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Users.total`, `Users.activeHalfyear`, `Users.activeMonth` on both
   `v2_0` and `v2_1`) are now plain `Int64?`, decoded leniently in place;
   the public `LenientInt` wrapper is removed (breaking).
-
-### Fixed
-
-- Renamed the misspelled `invalidResponse(underlayingError:)` label to
-  `underlyingError` (breaking).
-
-## [2.0.0] - 2026-07-06
-
-### Changed
-
 - Raised minimum deployment targets to iOS 18, macOS 15, watchOS 11,
   tvOS 18, visionOS 2 (breaking change).
 - `NodeInfoManager` is now nominally `Sendable` (previously
@@ -45,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Renamed the misspelled `invalidResponse(underlayingError:)` label to
+  `underlyingError` (breaking).
 - CLI prints the underlying decoding error detail when a response cannot be parsed.
 
 ## [1.5.0] - 2026-07-06
