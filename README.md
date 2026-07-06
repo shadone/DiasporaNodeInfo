@@ -65,8 +65,9 @@ print(nodeInfo.softwareName, nodeInfo.softwareVersion)
 print(nodeInfo.openRegistrations)
 print(nodeInfo.softwareHomepage ?? "no homepage")
 
-// Payload-only surfaces (metadata, services, the typed protocols arrays)
-// are still reached via the schema-specific payload.
+// Payload-only surfaces (metadata, services, the typed protocols arrays;
+// raw names are on `protocolNames`) are still reached via the
+// schema-specific payload.
 if let info = nodeInfo.v2_1 {
     print(info.metadata ?? [:])
 }
