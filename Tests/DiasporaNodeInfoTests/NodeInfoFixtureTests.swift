@@ -9,7 +9,57 @@ import Testing
 @testable import DiasporaNodeInfo
 
 struct NodeInfoFixtureTests {
-    @Test func roundTripsFixtureBuiltFromMemberwiseInits() throws {
+    @Test func roundTripsV2_0FixtureBuiltFromMemberwiseInits() throws {
+        let software = DiasporaNodeInfo.v2_0.Software(
+            name: "mastodon",
+            version: "4.2.0"
+        )
+        let users = DiasporaNodeInfo.v2_0.Users(
+            total: 50,
+            activeHalfyear: 25,
+            activeMonth: 10
+        )
+        let usage = DiasporaNodeInfo.v2_0.Usage(
+            users: users,
+            localPosts: 200,
+            localComments: 800
+        )
+        let services = DiasporaNodeInfo.v2_0.Services(
+            inbound: [.value(.rss2_0)],
+            outbound: [.value(.diaspora)]
+        )
+        let payload = DiasporaNodeInfo.v2_0.NodeInfo(
+            version: "2.0",
+            software: software,
+            protocols: [.value(.activitypub)],
+            services: services,
+            openRegistrations: true,
+            usage: usage,
+            metadata: ["nodeName": .string("Fixture Node")]
+        )
+
+        let data = try JSONEncoder().encode(payload)
+        let nodeInfo = try JSONDecoder().decode(NodeInfo.self, from: data)
+
+        #expect(nodeInfo.version == .v2_0)
+        let decoded = try #require(nodeInfo.v2_0)
+
+        #expect(decoded.version == "2.0")
+        #expect(decoded.software.name == "mastodon")
+        #expect(decoded.software.version == "4.2.0")
+        #expect(decoded.protocols == [.value(.activitypub)])
+        #expect(decoded.services?.inbound == [.value(.rss2_0)])
+        #expect(decoded.services?.outbound == [.value(.diaspora)])
+        #expect(decoded.openRegistrations == true)
+        #expect(decoded.usage.users.total == 50)
+        #expect(decoded.usage.users.activeHalfyear == 25)
+        #expect(decoded.usage.users.activeMonth == 10)
+        #expect(decoded.usage.localPosts == 200)
+        #expect(decoded.usage.localComments == 800)
+        #expect(decoded.metadata?["nodeName"] == .string("Fixture Node"))
+    }
+
+    @Test func roundTripsV2_1FixtureBuiltFromMemberwiseInits() throws {
         let software = DiasporaNodeInfo.v2_1.Software(
             name: "lemmy",
             version: "0.19.5",

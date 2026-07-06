@@ -281,6 +281,35 @@ final class NodeInfoManagerTests: Sendable {
         }
     }
 
+    /// Same wrapping, but for the transport failure at the schema-fetch
+    /// call site (discovery succeeds, then the schema document request
+    /// itself drops) — a different code path than
+    /// ``discovery_wrapsTransportFailure_inNetworkError()`` above, and a
+    /// deliberately different `URLError.Code` so the two tests can't pass
+    /// by accidentally sharing a stub.
+    @Test func schemaFetch_wrapsTransportFailure_inNetworkError() async {
+        let twentyOneURL = URL(string: "https://example.org/nodeinfo/2.1")!
+
+        MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
+            (200, jrdJSON([
+                ("http://nodeinfo.diaspora.software/ns/schema/2.1", twentyOneURL),
+            ]))
+        }
+        MockURLProtocol.stubFailure(url: twentyOneURL.absoluteString) { _ in
+            URLError(.timedOut)
+        }
+
+        do {
+            _ = try await manager.fetch(for: "example.org")
+            Issue.record("Expected .network")
+        } catch let NodeInfoManager.Error.network(underlyingError) {
+            let urlError = underlyingError as? URLError
+            #expect(urlError?.code == .timedOut)
+        } catch {
+            Issue.record("Expected .network, got \(error)")
+        }
+    }
+
     // MARK: - Typed throws signature
 
     /// Compile-level pin: `fetch(for:)` is declared

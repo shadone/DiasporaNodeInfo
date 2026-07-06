@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Round-trip fixture coverage for the v2.0 schema types and a
+  transport-failure test at the schema-fetch site.
+
 ## [2.0.0] - 2026-07-06
 
 ### Added
