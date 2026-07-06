@@ -28,7 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Usage counters (`Usage.localPosts`, `Usage.localComments`,
   `Users.total`, `Users.activeHalfyear`, `Users.activeMonth` on both
   `v2_0` and `v2_1`) are now plain `Int64?`, decoded leniently in place;
-  the public `LenientInt` wrapper is removed (breaking).
+  the public `LenientInt` wrapper is removed (breaking). When encoding,
+  nil counters now omit their keys (previously `null`) and string-sourced
+  counters re-encode as JSON integers.
 - Raised minimum deployment targets to iOS 18, macOS 15, watchOS 11,
   tvOS 18, visionOS 2 (breaking change).
 - `NodeInfoManager` is now nominally `Sendable` (previously

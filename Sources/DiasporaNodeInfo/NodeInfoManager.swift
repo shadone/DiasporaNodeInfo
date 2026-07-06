@@ -30,7 +30,7 @@ public struct NodeInfoManager: Sendable {
         /// The server response cannot be parsed.
         ///
         /// - Parameter underlyingError: the underlying JSONDecoder error.
-        case invalidResponse(underlyingError: Swift.Error)
+        case invalidResponse(underlyingError: any Swift.Error)
 
         /// The URL response was not an `HTTPURLResponse`.
         case nonHTTPResponse
