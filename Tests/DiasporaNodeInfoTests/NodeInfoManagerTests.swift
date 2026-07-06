@@ -260,6 +260,52 @@ final class NodeInfoManagerTests: Sendable {
         }
     }
 
+    // MARK: - Transport failures surface as .network
+
+    /// A transport-level failure (e.g. no connectivity) reported by the
+    /// `URLSession` must surface as `Error.network`, not escape untyped —
+    /// this is the whole point of adopting typed throws in `fetch(for:)`.
+    @Test func discovery_wrapsTransportFailure_inNetworkError() async {
+        MockURLProtocol.stubFailure(url: "https://example.org/.well-known/nodeinfo") { _ in
+            URLError(.notConnectedToInternet)
+        }
+
+        do {
+            _ = try await manager.fetch(for: "example.org")
+            Issue.record("Expected .network")
+        } catch let NodeInfoManager.Error.network(underlyingError) {
+            let urlError = underlyingError as? URLError
+            #expect(urlError?.code == .notConnectedToInternet)
+        } catch {
+            Issue.record("Expected .network, got \(error)")
+        }
+    }
+
+    // MARK: - Typed throws signature
+
+    /// Compile-level pin: `fetch(for:)` is declared
+    /// `async throws(NodeInfoManager.Error)`, so a bare `catch { }` clause's
+    /// implicit `error` is already statically typed as `NodeInfoManager.Error`
+    /// — no `as` downcast needed. This assignment would fail to compile if
+    /// `fetch` ever reverted to an untyped `throws`.
+    @Test func fetch_typedThrowsSignature_pinsErrorType() async {
+        MockURLProtocol.stub(url: "https://example.org/.well-known/nodeinfo") { _ in
+            (404, Data())
+        }
+
+        do {
+            _ = try await manager.fetch(for: "example.org")
+            Issue.record("Expected an error")
+        } catch {
+            let typed: NodeInfoManager.Error = error
+            if case .unsupported = typed {
+                // expected
+            } else {
+                Issue.record("Expected .unsupported, got \(typed)")
+            }
+        }
+    }
+
     // MARK: - Misc
 
     @Test func invalidDomain_throwsInvalidDomain() async {
@@ -280,6 +326,7 @@ final class NodeInfoManagerTests: Sendable {
             .temporaryUnavailable,
             .invalidResponse(underlyingError: DummyError()),
             .nonHTTPResponse,
+            .network(underlyingError: DummyError()),
         ]
 
         for error in cases {
@@ -351,7 +398,11 @@ private func nodeInfo20JSON() -> Data {
 
 private final class MockURLProtocol: URLProtocol {
     typealias StubResponse = (status: Int, body: Data, contentType: String)
-    typealias Stub = @Sendable (URLRequest) -> StubResponse
+    /// Either a response to hand back, or a transport-level failure to
+    /// report via `didFailWithError`, so tests can inject network errors
+    /// (e.g. a dropped connection) in addition to HTTP responses.
+    typealias StubOutcome = Result<StubResponse, any Swift.Error>
+    typealias Stub = @Sendable (URLRequest) -> StubOutcome
 
     private struct State {
         var stubs: [String: Stub] = [:]
@@ -386,24 +437,28 @@ private final class MockURLProtocol: URLProtocol {
             client?.urlProtocol(self, didFailWithError: URLError(.fileDoesNotExist))
             return
         }
-        let stub = handler(request)
-        let response = HTTPURLResponse(
-            url: url,
-            statusCode: stub.status,
-            httpVersion: "HTTP/1.1",
-            headerFields: ["Content-Type": stub.contentType]
-        )!
-        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: stub.body)
-        client?.urlProtocolDidFinishLoading(self)
+        switch handler(request) {
+        case let .success(stub):
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: stub.status,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": stub.contentType]
+            )!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: stub.body)
+            client?.urlProtocolDidFinishLoading(self)
+        case let .failure(error):
+            client?.urlProtocol(self, didFailWithError: error)
+        }
     }
 
     override func stopLoading() {}
 }
 
 /// Convenience wrappers that let tests pre-populate a stub with the default
-/// `application/json` content type via a 2-tuple, or with an explicit
-/// content type via a 3-tuple.
+/// `application/json` content type via a 2-tuple, with an explicit content
+/// type via a 3-tuple, or with an injected transport failure.
 private extension MockURLProtocol {
     static func stub(
         url: String,
@@ -411,7 +466,7 @@ private extension MockURLProtocol {
     ) {
         let wrapped: Stub = { request in
             let (status, body) = respond(request)
-            return (status, body, "application/json")
+            return .success((status, body, "application/json"))
         }
         stub(url: url, respond: wrapped)
     }
@@ -421,7 +476,17 @@ private extension MockURLProtocol {
         respond: @escaping @Sendable (URLRequest) -> (Int, Data, String)
     ) {
         let wrapped: Stub = { request in
-            respond(request)
+            .success(respond(request))
+        }
+        stub(url: url, respond: wrapped)
+    }
+
+    static func stubFailure(
+        url: String,
+        respond: @escaping @Sendable (URLRequest) -> any Swift.Error
+    ) {
+        let wrapped: Stub = { request in
+            .failure(respond(request))
         }
         stub(url: url, respond: wrapped)
     }

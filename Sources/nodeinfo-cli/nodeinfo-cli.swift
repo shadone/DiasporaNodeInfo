@@ -26,14 +26,15 @@ struct NodeInfoCLI: AsyncParsableCommand {
             }
 
             printSummary(summary, domain: domain)
-        } catch let error as NodeInfoManager.Error {
-            reportError("'\(domain)': \(error.localizedDescription)")
-            if case let .invalidResponse(underlyingError) = error {
-                reportError(String(describing: underlyingError))
-            }
-            throw ExitCode.failure
         } catch {
-            reportError("'\(domain)': unexpected error: \(error)")
+            reportError("'\(domain)': \(error.localizedDescription)")
+            switch error {
+            case let .invalidResponse(underlyingError),
+                 let .network(underlyingError):
+                reportError(String(describing: underlyingError))
+            default:
+                break
+            }
             throw ExitCode.failure
         }
     }

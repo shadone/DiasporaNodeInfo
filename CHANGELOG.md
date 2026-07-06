@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `fetch(for:)` now uses typed throws (`throws(NodeInfoManager.Error)`);
+  transport failures are wrapped in the new `Error.network(underlyingError:)`
+  case instead of escaping untyped (breaking).
+
+### Fixed
+
+- Renamed the misspelled `invalidResponse(underlayingError:)` label to
+  `underlyingError` (breaking).
+
 ## [2.0.0] - 2026-07-06
 
 ### Changed

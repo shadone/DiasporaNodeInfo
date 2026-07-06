@@ -34,6 +34,14 @@ public struct NodeInfoManager: Sendable {
 
         /// The URL response was not an `HTTPURLResponse`.
         case nonHTTPResponse
+
+        /// The transport-level failure thrown by the URL session.
+        ///
+        /// This is usually a `URLError`; callers can downcast to inspect
+        /// `URLError.Code`, e.g. `.notConnectedToInternet`, `.cancelled`.
+        ///
+        /// - Parameter underlyingError: the underlying transport error.
+        case network(underlyingError: any Swift.Error)
     }
 
     // MARK: Private
@@ -49,7 +57,7 @@ public struct NodeInfoManager: Sendable {
         self.session = session
     }
 
-    private func discoverNodeInfoUrlFromWellKnownNodeInfo(for domain: String) async throws -> URL {
+    private func discoverNodeInfoUrlFromWellKnownNodeInfo(for domain: String) async throws(Error) -> URL {
         var components = URLComponents()
         components.scheme = "https"
         components.host = domain
@@ -63,7 +71,13 @@ public struct NodeInfoManager: Sendable {
         request.allHTTPHeaderFields = [
             "Accept": "application/json",
         ]
-        let (data, urlResponse) = try await session.data(for: request)
+        let data: Data
+        let urlResponse: URLResponse
+        do {
+            (data, urlResponse) = try await session.data(for: request)
+        } catch {
+            throw Error.network(underlyingError: error)
+        }
         guard let httpUrlResponse = urlResponse as? HTTPURLResponse else {
             throw Error.nonHTTPResponse
         }
@@ -131,8 +145,8 @@ public struct NodeInfoManager: Sendable {
     /// Fetch node info for the given domain name.
     /// - Parameter domain: website domain name, without protocol. E.g. "mastodon.social".
     /// - Returns: ``NodeInfo`` for a given spec version.
-    /// - Throws ``NodeInfoManager/Error`` or ``Swift.Error`` in case of a network error.
-    public func fetch(for domain: String) async throws -> NodeInfo {
+    /// - Throws ``NodeInfoManager/Error``.
+    public func fetch(for domain: String) async throws(Error) -> NodeInfo {
         let nodeInfoUrl = try await discoverNodeInfoUrlFromWellKnownNodeInfo(for: domain)
 
         var request = URLRequest(url: nodeInfoUrl)
@@ -145,7 +159,13 @@ public struct NodeInfoManager: Sendable {
             "Accept": "application/json",
         ]
 
-        let (data, urlResponse) = try await session.data(for: request)
+        let data: Data
+        let urlResponse: URLResponse
+        do {
+            (data, urlResponse) = try await session.data(for: request)
+        } catch {
+            throw Error.network(underlyingError: error)
+        }
         guard let httpUrlResponse = urlResponse as? HTTPURLResponse else {
             throw Error.nonHTTPResponse
         }
@@ -189,6 +209,8 @@ extension NodeInfoManager.Error: LocalizedError {
             "The server response could not be parsed. (\(underlyingError.localizedDescription))"
         case .nonHTTPResponse:
             "The server response was not an HTTP response."
+        case let .network(underlyingError):
+            "The network request failed. (\(underlyingError.localizedDescription))"
         }
     }
 }
